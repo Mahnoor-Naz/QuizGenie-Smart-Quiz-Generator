@@ -1,0 +1,7 @@
+# .gitignore mein yeh add karo (agar nahi hai)
+.env
+node_modules/
+.claudio/
+.claude/
+curl
+*.log
