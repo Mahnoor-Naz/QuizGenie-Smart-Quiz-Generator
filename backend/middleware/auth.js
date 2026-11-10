@@ -5,7 +5,7 @@ export function requireApiKey(req, res, next) {
   const key = req.headers["x-api-key"];
   const expected = process.env.API_KEY;
 
-    if (!expected) {
+  if (!expected) {
     return res.status(500).json({ error: "Server auth misconfigured" });
   }
   if (key !== expected) {
