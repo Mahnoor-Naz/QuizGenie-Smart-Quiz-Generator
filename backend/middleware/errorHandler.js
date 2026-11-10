@@ -20,7 +20,8 @@ export function errorHandler(err, req, res, next) {
     return res.status(400).json({ error: "Invalid data" });
   }
 
-  res.status(err.status || 500).json({
-    error: process.env.NODE_ENV === "production" ? "Server error" : err.message,
+    const status = err.status || 500;
+  res.status(status).json({
+    error: status === 500 && process.env.NODE_ENV === "production" ? "Server error" : err.message,
   });
 }
