@@ -8,13 +8,15 @@ import { mockQuizList, mockQuiz, mockAttemptResult } from "../mock/mockQuiz.js";
 // ON/OFF SWITCH
 // true  = use mock data (backend not ready)
 // false = use the real backend
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 // Address of the real backend (change this to your backend's URL)
-const API_BASE_URL = "http://localhost:[PORT]/api";
-
+const API_BASE_URL = "http://localhost:5000/api";
 // Axios setup for the real backend
-const api = axios.create({ baseURL: API_BASE_URL });
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: { "x-api-key": import.meta.env.VITE_API_KEY },
+});
 
 // MOCK HELPERS
 
