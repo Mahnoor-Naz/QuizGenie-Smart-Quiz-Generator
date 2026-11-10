@@ -98,7 +98,7 @@ Open the local link shown in the terminal in your browser.
 |------|------|------------------|
 | Mahnoor Ahmer | Frontend Developer and manager | React pages, UI components, routing and connecting the UI to the API |
 | [Name] | Backend Developer | [Responsibilities] |
-| [Name] | AI Integration | [Responsibilities] |
+| Eman Ansar | AI Integration | Connected the frontend to the backend; designed and improved the AI prompt (topic & PDF modes, difficulty levels, answer rules); set up Groq (`openai/gpt-oss-120b`) via configurable `.env`; fixed silent fallback, error status codes (400/502/503), mode detection (`sourceType`) and answer position bias (shuffle); maintained the prompt log with before/after evidence |
 | [Name] | Database and Quiz Management | [Responsibilities] |
 | [Name] | Quiz Evaluation, Testing and Integration | [Responsibilities] |
 
