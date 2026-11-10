@@ -56,17 +56,234 @@
 
 | 15 | Tested topics, a text PDF, an image-only PDF and other file types | Explained what should happen in each case | No bug. The app can't read text inside images, and only PDFs can be uploaded on purpose | Topic quiz works , PDF questions come from the file , image-only PDF shows "PDF has no readable text" . Reading images is a future idea | Eman Ansar |
 
-Problem: The AI-generated prompt code detected PDF vs topic mode with source.length > 200.
-Why it’s wrong: It silently depends on the 200-character topic limit in validate.js, and short PDFs (200 characters or fewer) were treated as topics, losing the “use only the lecture content” instructions.
-How I found it: Code review of the AI’s suggestion.
-Fix: Asked the AI to use an explicit sourceType instead. The route sets sourceType: file ? "pdf" : "topic", generateQuestions() passes it on, and generateWithAI() uses sourceType === "pdf".
-Evidence: A short PDF showed Mode: TOPIC before the fix and Mode: LECTURE (pdf) after it.
+## Problems Found and Fixed in AI-Generated Code
+### Problem 1: Silent Fallback Hid AI Failures
 
-Problem (found by you): “Empty-PDF errors returned 500 (server error) instead of 400 (user error), because the thrown Error had no status.”
+**File:** `backend/services/aiService.js`
 
-Problem (silent fallback): “When the AI failed (wrong key, wrong model), fake placeholder questions were saved to the database and shown as a successful quiz. Failures were only visible in the terminal.”
+**What was wrong:**
+When the AI call failed for any reason (wrong API key, wrong model name, network error), the code quietly created fake questions like "Sample question 1" and "Correct answer 1". These fake questions were saved in the database and shown to the student as a successful quiz.
 
-Fix: “Errors now carry the correct status (400/502/503). AI failures show a clear message, and nothing is saved. Fake questions only appear when a developer explicitly turns them on.”
+**Why it was a serious problem:**
+- The app looked like it was working, even when the AI was not working at all.
+- The real error was only visible in the backend terminal.
+- It hid two real errors during testing: a 401 (invalid API key) and a 404 (model not found).
+- In a live demo, fake questions could be shown without anyone noticing.
+
+**How I found it:**
+I generated a quiz on "generative AI" and got "Sample question 1…" instead of real questions. The backend terminal showed `AI failed: 401 Invalid API Key → fallback`.
+
+**How I fixed it:**
+- When the AI fails, the code now throws a clear error instead of making fake questions.
+- The student sees: *"Quiz generation failed. Please try again."* (status 502).
+- Nothing is saved in the database when the AI fails.
+- Fake questions are only used if a developer turns them on on purpose with `AI_FALLBACK=true` in `.env`.
+
+**Evidence:**
+- Before: 
+![alt text](image.png)
+![alt text](image-1.png)
+- After: 
+![alt text](image-2.png)
+![alt text](image-3.png)
+
+### Problem 2: Topic/PDF Mode Detected by Text Length (Non-Trivial problem Found by me) 
+
+**File:** `backend/services/aiService.js`
+
+**What was wrong:**
+The AI-suggested code decided whether the input was a topic or a PDF using its length:
+
+```javascript
+const isLecture = source.length > 200;
+```
+
+**Why it was a problem:**
+- A short PDF (200 characters or less) would be treated as a topic, so the AI would use general knowledge instead of the lecture content.
+- The code secretly depended on the 200-character topic limit in another file (`validate.js`). If someone changed that limit, mode detection would break without any warning.
+
+**How I found it:**
+While reviewing the AI's suggested code, I noticed that text length is not a reliable way to know where the input came from.
+
+**My prompt to the AI:**
+> "A topic can be longer than 200 characters and a PDF can contain less than 200 characters. So source length is not a reliable way to identify the mode. Please revise your solution to use an explicit `sourceType` value."
+
+**How I fixed it:**
+- The route now passes `sourceType: file ? "pdf" : "topic"` to the AI service.
+- The server decides the mode based on whether a file was actually uploaded, so the user cannot fake it.
+- The frontend did not need any changes.
+
+**Evidence:**
+Before
+![alt text](image.png)
+![alt text](image-2.png)
+After
+![alt text](image-3.png)
+![alt text](image-4.png)
+---
+
+### Problem 3: Empty PDF Returned Server Error 500 Instead of 400 (Non-Trivial problem Found by me) 
+
+**Files:** `backend/services/pdfService.js`, `backend/middleware/errorHandler.js`
+
+**What was wrong:**
+`pdfService.js` threw an error without a status code:
+
+```javascript
+if (!text) throw new Error("PDF has no readable text");
+```
+
+The error handler uses `err.status || 500`, so an empty PDF was reported as **500 (server error)**.
+
+**Why it was a problem:**
+- An empty PDF is the user's mistake, so it should be **400 (bad request)**, not 500.
+- Wrong status codes make debugging and monitoring confusing.
+- In production mode, the error handler would replace the message with "Server error", so the student would not know what went wrong.
+
+**How I found it:**
+I tested with an empty PDF and image-only PDF and checked how the error was handled between the two files.
+
+**How I fixed it:**
+- Empty PDFs now return **400** with "PDF has no readable text".
+- Damaged or password-protected PDFs now return **400** with a clear message.
+- AI failures return **502**, and missing AI setup returns **503**.
+- The error handler now hides only unexpected 500 errors in production, and keeps helpful messages for other errors.
+
+**Evidence:**
+Before
+![alt text](image.png)
+After
+![alt text](image-1.png)
+
+### Problem 4: Frontend Was Never Connected to the Backend
+
+**File:** `frontend/src/api/quizApi.js`
+
+**What was wrong:**
+- `USE_MOCK = true`, so the frontend always used sample data.
+- The backend URL still had a placeholder: `http://localhost:[PORT]/api`.
+- Every quiz showed the same 5 operating system questions, no matter which topic or number of questions was chosen.
+
+**How I found it:**
+I entered "generative AI" with 10 questions but got 5 questions about operating systems. The backend terminal showed no activity, and the quiz ID in the URL was a timestamp, which proved the request never reached the backend.
+
+**How I fixed it:**
+- Set `USE_MOCK = false`
+- Set `API_BASE_URL = "http://localhost:5000/api"`
+
+**Evidence:**
+Before: ![alt text](image.png)
+After: ![alt text](image-1.png)
+
+### Problem 5: Correct Answer Position Bias
+
+**File:** `backend/services/aiService.js`
+
+**What was wrong:**
+The original prompt example showed `"correctIndex": 0`. AI models tend to copy examples and often put the correct answer first, so students could guess by always choosing option A.
+
+**Why a prompt alone cannot fix it:**
+AI models are not good at real randomness. Even when asked to vary positions, they still follow patterns.
+
+**How I fixed it:**
+Added a `shuffleOptions()` function that randomly reorders the 4 options in code (Fisher-Yates shuffle) and updates `correctIndex` to the new position of the correct answer.
+
+**Evidence:**
+
+Generated 4 quizzes (35 questions). The terminal printed the AI's positions and the positions after shuffling.
+
+| Position | Before shuffle (AI) | After shuffle (code) |
+|---|---|---|
+| 0 (A) | 11 (31%) | 6 (17%) |
+| 1 (B) | 13 (37%) | 9 (26%) |
+| 2 (C) | 6 (17%) | 10 (29%) |
+| 3 (D) | 5 (14%) | 10 (29%) |
+| A + B together | **24 (69%)** | 15 (43%) |
+
+![alt text](image-1.png)
+![alt text](image-2.png)
+![alt text](image-3.png)
+
+### Problem 6: Hidden Default Model Did Not Match the Provider (Non-Trivial problem Found by me) 
+
+**File:** `backend/services/aiService.js`
+
+**What was wrong:**
+
+```javascript
+const AI_MODEL = process.env.AI_MODEL || "gpt-4o-mini";
+```
+
+We switched to Groq, but the default was still an OpenAI model. If `AI_MODEL` was missing in `.env`, the app would ask Groq for a model it doesn't have and fail with a confusing 404 error.
+
+**How I fixed it:**
+- Removed the hidden default.
+- If the model is missing, the student gets a clear message (503), and the terminal says exactly what is missing.
+- The backend startup now shows the active model.
+
+---
+## Frontend/Backend Mismatches
+
+### Mismatch 1: Frontend Still Using Mock Data
+
+**Problem:** `quizApi.js` still had `USE_MOCK = true` and a placeholder URL (`localhost:[PORT]`). The frontend never called the backend, so every quiz showed the same 5 operating system questions, whatever the topic or count.
+
+**How I found it:** I entered "generative AI" with 10 questions and got 5 OS questions. The backend terminal showed no activity.
+
+**Fix:**
+```javascript
+const USE_MOCK = false;
+const API_BASE_URL = "http://localhost:5000/api";
+```
+
+![Before](p4-before-os-questions.png)
+![After](p4-after-real-questions.png)
+
+---
+
+### Mismatch 2: Missing API Key Header
+
+**Problem:** The backend requires an `x-api-key` header for create, rename and delete, but the frontend did not send it. Both sides worked alone but did not agree, so these requests were rejected (401).
+
+**Fix:** Added the header once to the shared axios instance, so every request sends it:
+```javascript
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: { "x-api-key": import.meta.env.VITE_API_KEY },
+});
+```
+`VITE_API_KEY` in `frontend/.env` must match `API_KEY` in `backend/.env`.
+
+---
+
+## Other Problems Solved
+
+| Problem | Fix |
+|---|---|
+| Auth could switch off silently when `API_KEY` was missing | Restored the safe check: no key → requests rejected with a clear error |
+| Startup message said "API key" but only checked the app key | Startup now shows App key, AI key and Model separately |
+| Damaged or password-protected PDFs gave confusing 500 errors | Now return 400: "Could not read this PDF. It may be damaged or password-protected." |
+| OpenAI API is paid | Made the provider configurable (`AI_BASE_URL`, `AI_MODEL`) and switched to free Groq |
+| Model `llama-3.3-70b-versatile` returned 404 | Listed the provider's available models and chose `openai/gpt-oss-120b` |
+
+## Prompt Improvement (Version 1 → Version 2)
+
+**Problems with the original prompt (V1):**
+- No difference between topic mode and PDF mode
+- Difficulty was just one word ("Easy", "Hard") with no meaning
+- No rules for good wrong options
+- Example showed `correctIndex: 0` (caused answer bias)
+- No protection against instructions hidden inside PDF text
+
+**Improvements in the new prompt (V2):**
+- System message with clear rules + user message with the inputs
+- Topic mode uses general knowledge; PDF mode uses only the lecture content
+- Difficulty defined: Easy = recall, Medium = understanding/application, Hard = analysis/reasoning
+- Rules for believable wrong options, no "All of the above"
+- No duplicate or unclear questions
+- Useful 1–2 sentence explanations
+- Lecture text placed inside `<lecture_content>` tags and treated as study material only
+
 
 ## Vague vs Detailed Prompt (UI component: QuizForm)
 
