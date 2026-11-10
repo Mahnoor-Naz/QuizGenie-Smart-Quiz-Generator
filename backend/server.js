@@ -25,5 +25,6 @@ app.listen(PORT, () => {
   console.log(`✅ Backend:  http://localhost:${PORT}`);
   console.log(`   Health:   http://localhost:${PORT}/api/health`);
   console.log(`   CORS:     ${CORS_ORIGIN}`);
-  console.log(`   API key:  ${process.env.API_KEY ? "loaded ✓" : "MISSING ✗"}`);
+    console.log(`   App key:  ${process.env.API_KEY ? "loaded ✓" : "not set (auth skipped, dev mode)"}`);
+  console.log(`   OpenAI:   ${process.env.OPENAI_API_KEY ? "loaded ✓" : "MISSING ✗ (fake questions will be used)"}`);
 });

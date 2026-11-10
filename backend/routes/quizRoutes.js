@@ -78,8 +78,9 @@ router.post(
         title = topic.trim();
       }
 
-      const generated = await generateQuestions({
+            const generated = await generateQuestions({
         source,
+        sourceType: file ? "pdf" : "topic",
         difficulty,
         numQuestions: Number(numQuestions),
       });

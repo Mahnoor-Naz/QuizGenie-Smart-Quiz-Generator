@@ -2,8 +2,13 @@
 import OpenAI from "openai";
 
 const openai = process.env.OPENAI_API_KEY
-  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  ? new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+      baseURL: process.env.AI_BASE_URL || undefined,
+    })
   : null;
+
+const AI_MODEL = process.env.AI_MODEL || "gpt-4o-mini";
 
 export async function generateQuestions({ source, difficulty, numQuestions }) {
   if (openai) {
@@ -27,13 +32,14 @@ Return ONLY JSON:
 { "questions": [ { "text": "...", "options": ["A","B","C","D"], "correctIndex": 0, "explanation": "..." } ] }`;
 
   const res = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+    model: AI_MODEL,
     messages: [{ role: "user", content: prompt }],
     response_format: { type: "json_object" },
     temperature: 0.7,
   });
 
   const parsed = JSON.parse(res.choices[0].message.content);
+  console.log("Correct positions:", parsed.questions.map(q => q.correctIndex));
   if (!Array.isArray(parsed.questions) || parsed.questions.length === 0) {
     throw new Error("AI returned no questions");
   }
