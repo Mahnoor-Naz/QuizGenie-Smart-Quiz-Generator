@@ -1,5 +1,13 @@
 // services/evaluationService.js
 export function evaluateAnswers(questions, submittedAnswers) {
+  // NAYA FIX: Backend par strict validation
+  // Agar user ne saare answers nahi bheje, toh error throw karein
+  if (submittedAnswers.length !== questions.length) {
+    const err = new Error(`Incomplete answers. Expected ${questions.length}, got ${submittedAnswers.length}`);
+    err.status = 400;
+    throw err;
+  }
+
   const map = new Map(
     submittedAnswers.map((a) => [Number(a.questionId), a.selectedIndex])
   );

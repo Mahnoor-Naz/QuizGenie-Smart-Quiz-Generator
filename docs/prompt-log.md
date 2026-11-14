@@ -1,303 +1,593 @@
-# Prompt Log – QuizGenie (Frontend)
+# QuizGenie – Complete AI Prompt Log and Code Review Report
 
-| # | Prompt (short) | What AI gave | What was wrong | How we fixed it | Member |
-|---|---|---|---|---|---|
-| 1 | Generate a README for QuizGenie (description, features, tech stack, API endpoints, setup, usage, team, GitHub collaboration) | Full README in Markdown | Some fields were placeholders (clone URL, team names, database name, start command) | Added my own name; other placeholders will be filled before final submission | Mahnoor |
+## 1. Prompt Log – QuizGenie (Frontend)
 
-| 2 | Create src/mock/mockQuiz.js with mockQuizList, mockQuiz (without correct answers) and mockAttemptResult (4/5 correct), using exact field names | Mock data file with 3 named exports | Nothing wrong. Checked field names against our API contract and checked answers manually | No fix needed | Mahnoor |
+**Member: Mahnoor**
 
-| 3 | How to test the mock data file from the terminal without creating a new file | Node commands that check exports, field values, hidden answers and score | Nothing wrong. All 8 checks returned true | No fix needed | Mahnoor |
+| # | Prompt (Short) | What AI Provided | What Was Wrong | How We Fixed It |
+|---|---|---|---|---|
+| 1 | Generate a README for QuizGenie with its description, features, tech stack, API endpoints, setup, usage, team, and GitHub collaboration details. | A complete README file in Markdown. | Some details were left as placeholders, including the clone URL, team names, database name, and start command. | Added my own name. The remaining project-specific details will be completed before final submission. |
+| 2 | Create `src/mock/mockQuiz.js` with `mockQuizList`, `mockQuiz` (without correct answers), and `mockAttemptResult` (4/5 correct), using the exact field names. | A mock data file with three named exports. | No issues were found. | Checked the field names against our API contract and manually verified the answers. No changes were needed. |
+| 3 | How can I test the mock data file from the terminal without creating another file? | Node.js commands to check exports, field values, hidden answers, and scores. | No issues were found. | Ran all eight checks, and they returned `true`. |
+| 4 | Set up routing for three screens using `react-router-dom` 7.18.5. | `main.jsx`, `App.jsx`, and three placeholder pages. | No issues were found. | Used the correct React Router v7 syntax with `Routes` and `element`. Tested `/`, `/quiz/1`, `/results`, and `/abc` in the browser. |
+| 5 | Create a `quizApi.js` service file with CRUD functions, a mock on/off switch, loading delay, and error handling. | A service file with six functions using either mock data or Axios. | Two API contract mismatches were found: errors were read from `message` instead of `error`, and the PDF field was named `pdf` instead of `file`. | Changed the error handling to `data?.error` and updated the form field to `formData.get("file")`. |
+| 6 | How can I test all `quizApi.js` functions from the terminal without creating a new file? | Node.js commands covering CRUD functions, quiz submission, empty form errors, and invalid IDs. | The suggested commands were supposed to run from the main project folder, but the `src` folder was inside `frontend`. | Ran the commands from the `frontend` directory. All eight checks passed. Evidence: `quizapi-test.png`. |
+| 7 | Create a quiz generator form in React where users can enter a topic or upload a PDF, select difficulty and question count, and generate a quiz. | `QuizForm.jsx`, `QuizForm.css`, and an updated Home page. | The PDF was sent using `pdf` instead of the required `file` field. There was no file size limit, error messages were not announced to screen readers, tabs lacked proper accessibility information, keyboard focus was unclear, and mobile responsiveness needed improvement. | Kept the original version for comparison and created a more detailed prompt to address these issues. |
+| 8 | Rebuild the QuizForm with clear requirements for data handling, validation, accessibility, responsiveness, and state management. | Updated `QuizForm.jsx` and `QuizForm.css`. | AI suggested changing `formData.get("pdf")` to `formData.get("file")` in `quizApi.js`, but that correction had already been made earlier. | Ignored the outdated suggestion and used the updated form and CSS. Tested the form on desktop and mobile. |
+| 9 | Add a saved quiz list below the QuizForm with Start, Rename, and Delete options, including loading, empty, and error states. | `SavedQuizList.jsx`, `SavedQuizList.css`, and an updated `Home.jsx`. | No major issues were found. Renamed and deleted quizzes return after refreshing because mock data is not permanently stored. | Tested loading, empty states, rename, delete confirmation, cancel, Start button, and mobile layout. The in-card confirmation also worked better for keyboard and screen-reader users than a browser pop-up. Evidence: `home-mobile.png`, `home-delete-confirm.png`. |
+| 10 | Create the Attempt Quiz and Results screens with a professional light theme, question navigation, answer selection, scoring, and mobile support. | `index.css`, `App.css`, `QuestionCard.jsx`, `QuestionCard.css`, `AttemptQuiz.jsx`, `AttemptQuiz.css`, `Results.jsx`, and `Results.css`. | The new code worked correctly. However, I noticed that `App.jsx` was not importing `App.css`, so the header styles from that file would not be applied. Mock mode also displayed the same five operating system questions for every quiz. | Added `import "./App.css"` to `App.jsx`. Tested question navigation, Previous/Next, unanswered warnings, submission, results, Try Again, refresh, keyboard navigation, and mobile layout. |
+| 11 | Restyle the Home page to match the same light theme and use a two-column layout on larger screens. | Updated `QuizForm.css`, `SavedQuizList.css`, a new `Home.css`, and one import in `Home.jsx`. | No issues were found after checking the CSS variables. | Used PowerShell `Select-String` to confirm that every CSS variable existed in `index.css`. Tested desktop, iPhone SE view, and keyboard Tab focus. |
 
-| 4 | Routing for 3 screens using react-router-dom 7.18.5 | main.jsx (router setup), App.jsx (routes + header), 3 placeholder pages | Nothing wrong. Used the correct v7 syntax (Routes + element, not old Switch) | No fix needed. Tested /, /quiz/1, /results, /abc in browser | Mahnoor |
+---
 
-| 5 | Data service file quizApi.js with CRUD functions, mock on/off switch, loading delay and error handling | quizApi.js with 6 functions using mock data or axios | 2 mismatches with our API contract: errors were read from "message" instead of "error", and the PDF field was named "pdf" instead of "file" | Fixed by hand: changed to data?.error and formData.get("file") | Mahnoor |
+## 2. Prompt Log – QuizGenie (AI Integration)
 
-| 6 | How to test all quizApi.js functions from the terminal without creating a file | Node command testing all CRUD functions, submit, empty form error and wrong id error | AI said to run it from the main project folder, but the src folder is inside frontend, so it must be run from the frontend folder | Ran it from the frontend folder; all 8 checks passed (screenshot: quizapi-test.png) | Mahnoor |
+**Member: Eman Ansar**
 
-| 7 | Vague prompt: "Create a quiz generator form in React. The user should be able to type a topic or upload a PDF, pick a difficulty level and how many questions they want, then press a button to generate the quiz." | QuizForm.jsx, QuizForm.css and Home page update | Sent PDF as "pdf" instead of "file" (mismatch with API contract); no file size limit; error not announced to screen readers; Topic/PDF tabs don't tell screen readers which one is selected; no keyboard focus style; no mobile adjustments; labels centered and low contrast on dark background | Kept as the vague version for comparison; fixed with a detailed prompt | Mahnoor |
+| # | Prompt (Short) | What AI Provided | What Was Wrong | How We Fixed It |
+|---|---|---|---|---|
+| 1 | Explain how `aiService.js` communicates with OpenAI, builds prompts, and handles generated questions. | A step-by-step explanation and some possible weak points, including fake fallback questions, answer position bias, question count validation, and environment configuration. | The concern about `.env` loading was only a possibility and had not been verified. | Shared `server.js` to check the actual environment loading sequence. |
+| 2 | Check whether `server.js` loads `.env` before the AI service starts. | AI confirmed that `.env` loads first but incorrectly identified the startup API key message as an AI key issue. | The message was checking our application's own `API_KEY`, not the OpenAI API key. | Shared `quizRoutes.js` and `auth.js`. AI then corrected its explanation. |
+| 3 | Explain `quizRoutes.js` and how a request reaches the AI service. | A step-by-step explanation of the request flow and several possible problems. | Some concerns about PDF cleanup and processing were raised before the PDF service had been reviewed. | Reviewed `pdfService.js` next and corrected the earlier assumptions. |
+| 4 | Check how PDFs are processed, including scanned, empty, and long PDFs. | Found that empty PDFs were already rejected and extracted text was limited to 8,000 characters. Scanned PDFs containing only page numbers could still pass, while long documents only used the first 8,000 characters. | An earlier response incorrectly suggested that there was no text limit. | Corrected the understanding and recorded the remaining limitations for future improvements. |
+| 5 | Review `validate.js` for topic, difficulty, and question count validation. | Explained the existing validation rules and identified possible issues with short topics and empty topic fields during PDF uploads. | Some issues depended on how the frontend submitted the form data. | Recorded them for further testing with the frontend. |
+| 6 | Review the prompt used to generate quiz questions. | Identified missing rules for lecture-based questions, difficulty levels, wrong options, explanations, and answer positions. | The original prompt did not provide enough instructions to control question quality. | Asked AI to rewrite the prompt with clearer requirements. |
+| 7 | Rewrite only the AI prompt for topic mode and PDF mode, including difficulty levels, wrong options, explanations, and JSON fields. | A new prompt with separate topic and PDF instructions. | The first solution identified PDF mode using text length greater than 200 characters, which was unreliable. | Requested an explicit `sourceType` value. The route now sends `pdf` when a file is uploaded and `topic` otherwise. |
+| 8 | Test quiz generation using the topic "generative AI" with 10 questions. | Suggested checking the backend terminal, browser Network tab, and relevant source files. | The application showed five operating system questions. The backend received no request because the application's `API_KEY` was missing. | For local testing, changed the backend configuration to skip the application key check when `API_KEY` is not configured. |
+| 9 | Investigate why the backend reported that the OpenAI key was missing. | Provided steps to check the `.env` file and environment variables. | There was no actual `.env` file; only `.env.example` existed, so the AI key was never loaded. | Created the `.env` file, kept the real key out of `.env.example`, and added a startup message to show whether the AI key was loaded. |
+| 10 | Investigate why the application still generated the same operating system questions. | Identified that the frontend was still using mock data and had an incomplete backend URL. | `USE_MOCK` was still `true`, and the backend address contained `[PORT]`. | Disabled mock mode and configured the API address as `http://localhost:5000/api`. |
+| 11 | Investigate why the generated quiz displayed "Sample question 1" and "Correct answer 1". | Explained the fallback question mechanism and showed where the actual error could be found. | The backend terminal showed a 401 Invalid API Key error because an example key was still present in `.env`. The application hid the real error and displayed fake questions instead. | Replaced the example key with a valid key. Removing silent error handling was also identified as an important improvement. |
+| 12 | Find a free alternative to the paid OpenAI API. | Suggested Groq as an alternative provider with an OpenAI-compatible API. | No major issue was found. | Updated `aiService.js` to read the provider URL and model from `.env`, allowing the provider and model to be changed through configuration. |
+| 13 | Investigate why Groq returned "Invalid API Key". | Provided a safe way to check the key's length and beginning without displaying the complete key. | The copied key was only 22 characters long, indicating that the actual key had not been copied correctly. | Generated a new key, copied it from the provider's popup, and checked its length. |
+| 14 | Investigate why Groq reported that the selected model could not be found. | Provided a command to list the models available to the API key. | The suggested model `llama-3.3-70b-versatile` was no longer available for our account. | Listed the available models and switched to `openai/gpt-oss-120b`. |
+| 15 | Test topic input, text PDFs, image-only PDFs, and other file types. | Explained the expected behaviour for each input type. | No implementation bug was found. The current PDF extraction process cannot read text embedded only in images. | Confirmed that topic generation works, text-based PDFs generate questions from their content, image-only PDFs return "PDF has no readable text", and unsupported file types are rejected. OCR support was recorded as a possible future improvement. |
 
-| 8 | Detailed prompt: rebuild the same QuizForm with clear requirements for data, validation, accessibility, responsiveness and state | New QuizForm.jsx and QuizForm.css meeting all the requirements | AI also told me to change formData.get("pdf") to "file" in quizApi.js, but this was already fixed earlier, so the instruction was outdated | Did not apply the outdated change; used the new QuizForm and CSS and tested them on desktop and mobile | Mahnoor |
+---
 
-| 9 | Home page: saved quiz list (SavedQuizList.jsx + CSS) below the QuizForm with Start, Rename and Delete, plus loading, empty and error states | SavedQuizList.jsx, SavedQuizList.css and updated Home.jsx | Nothing wrong. AI chose an in-card delete confirmation instead of a browser pop-up, which works better with keyboard and screen readers. With mock data, renamed and deleted quizzes come back after a page refresh (expected until the real backend is connected) | No fix needed. Tested list loading, empty title error, rename, delete with confirmation and cancel, empty list message, Start button and mobile layout | Mahnoor | (screenshots: home-mobile.png, home-delete-confirm.png)
+## 3. Problems Found and Fixed in AI-Generated Code (AI Integration)
 
-| 10 | Attempt Quiz and Results screens with a professional light theme: design system (CSS variables, Inter font), summary bar with progress, A–D option cards, question navigator, unanswered check, grade and breakdown cards, answer review, Try Again, and mobile layout | index.css, App.css, QuestionCard.jsx/.css, AttemptQuiz.jsx/.css, Results.jsx/.css | Nothing wrong in the new code. AI noticed that App.jsx was not importing App.css (left out in the earlier routing code), so the header styles would not apply. With mock data every quiz shows the same 5 OS questions (expected until the backend and AI are connected) | Added import "./App.css" to App.jsx. Tested answering, Previous/Next, navigator, unanswered warning, submit, results, Try Again, refresh (No result found), keyboard and mobile layout | Mahnoor |
-
-| 11 | Restyle the Home page (QuizForm and Saved Quizzes) to the same light theme, two-column layout on large screens | AI rewrote QuizForm.css and SavedQuizList.css with the index.css variables, added Home.css for the grid layout and one import in Home.jsx | Before pasting, I checked with Select-String that every CSS variable the AI used actually exists in index.css. All were present, so no change was needed. This also fixed the earlier issue where the saved quiz headings were dark text on a dark card. Tested on desktop, iPhone SE view and keyboard Tab focus. |
-
-# Prompt Log – QuizGenie (AI Integration)
-
-| 1 | Asked AI to explain how `aiService.js` talks to OpenAI, builds the prompt and handles the questions | A simple step-by-step explanation, plus weak points: fake questions are used when the AI fails, the right answer is often option A, the number of questions is not checked, and a possible problem with loading the `.env` file | The `.env` loading problem was only a guess, not confirmed | Shared `server.js` to check it | Eman Ansar |
-
-| 2 | Asked AI to check whether `server.js` loads the `.env` file before the AI service starts | Confirmed `.env` loads first, so no problem there. It also said the "API key" message on startup was a bug | AI got this wrong. That message checks our app's own password (`API_KEY`), not the OpenAI key | AI corrected itself after seeing `quizRoutes.js` and `auth.js` | Eman Ansar |
-
-| 3 | Asked AI to explain `quizRoutes.js` and how a request reaches the AI | Explained each step of the request. Found that fake quizzes get saved as real ones, uploaded PDFs are left on disk when the input is wrong, and the saved question count can be different from the real count | Some PDF worries were too strong because AI hadn't seen the PDF code yet | Checked `pdfService.js` next and AI corrected those points | Eman Ansar |
-
-| 4 | Asked AI to check how PDFs are read (scanned, empty and long PDFs) | Empty PDFs are already rejected and text is limited to 8,000 characters. A scanned PDF with only page numbers can still pass, and long lectures only use the first few pages | AI had earlier said there was no size limit, which was wrong | Noted these as known limits for later | Eman Ansar |
-
-| 5 | Asked AI to review `validate.js` (topic, difficulty, number of questions) | Difficulty and question count only accept fixed values, which is good. Short topics like "AI" are rejected, and an empty topic box might block PDF uploads | Some issues depend on how the frontend sends data | Noted them for testing | Eman Ansar |
-
-| 6 | Asked AI to judge the prompt used to make the questions | The prompt only controls the format. It doesn't tell the AI to stick to the lecture, doesn't explain the difficulty levels, has no rules for wrong options, and its example pushes the right answer to option A | The old prompt didn't control quality | Asked AI to write a better prompt | Eman Ansar |
-
-| 7 | Asked AI to rewrite only the prompt: topic mode and PDF mode, clear difficulty levels, good wrong options, useful explanations, same JSON fields | A new prompt with clear rules for each part. To tell topic and PDF apart, it checked the text length (over 200 characters = PDF) | Text length isn't reliable: a short PDF would be treated as a topic | I asked for a clear `sourceType` value instead. The route now sends "pdf" when a file is uploaded and "topic" otherwise | Eman Ansar |
-
-| 8 | Tested: typed "generative AI" and chose 10 questions | Asked me to check the backend terminal, the browser Network tab and search the code | The app showed 5 operating system questions. The backend received nothing, and the app password (`API_KEY`) was missing, so requests were rejected | Made the backend skip the password check when no `API_KEY` is set (only for local testing) | Eman Ansar |
-
-| 9 | The backend said the OpenAI key was missing | Steps to check the `.env` file | There was no `.env` file, only `.env.example`, so the key was never loaded | Created `.env`, kept the real key out of `.env.example`, and added a startup message showing whether the AI key is loaded | Eman Ansar |
-
-| 10 | Still seeing the same OS questions | Found that the frontend uses test data from `mockQuiz.js` through `quizApi.js` | The frontend was still in test mode (`USE_MOCK = true`) and the backend address still said `[PORT]` | Turned test mode off and set the address to `http://localhost:5000/api` | Eman Ansar |
-
-| 11 | The quiz showed "Sample question 1" and "Correct answer 1" | Explained that these are fake backup questions and showed where the real error appears in the terminal | The terminal said the key was invalid: the example key from the AI's message was still in `.env`. The app hid the error and showed fake questions instead | Put in a real key. Hiding errors is still to be fixed | Eman Ansar |
-
-| 12 | Asked for a free API instead of paid OpenAI | Suggested Groq, which is free and works like OpenAI. The provider and model can now be changed from `.env` | Nothing wrong | `aiService.js` now reads the address and model from `.env`. Without them it still uses OpenAI | Eman Ansar |
-
-| 13 | Groq said "Invalid API Key" | A safe check showing only the start and length of the key | The key was only 22 characters instead of about 56. I had copied the hidden/short version | Made a new key, copied it from the popup, and checked the length | Eman Ansar |
-
-| 14 | Groq said the model was not found | A command to list the models our key can use | The model AI suggested (`llama-3.3-70b-versatile`) was no longer available | Listed the models and switched to `openai/gpt-oss-120b` | Eman Ansar |
-
-| 15 | Tested topics, a text PDF, an image-only PDF and other file types | Explained what should happen in each case | No bug. The app can't read text inside images, and only PDFs can be uploaded on purpose | Topic quiz works , PDF questions come from the file , image-only PDF shows "PDF has no readable text" . Reading images is a future idea | Eman Ansar |
-
-## Problems Found and Fixed in AI-Generated Code
 ### Problem 1: Silent Fallback Hid AI Failures
 
 **File:** `backend/services/aiService.js`
 
 **What was wrong:**
-When the AI call failed for any reason (wrong API key, wrong model name, network error), the code quietly created fake questions like "Sample question 1" and "Correct answer 1". These fake questions were saved in the database and shown to the student as a successful quiz.
 
-**Why it was a serious problem:**
-- The app looked like it was working, even when the AI was not working at all.
-- The real error was only visible in the backend terminal.
-- It hid two real errors during testing: a 401 (invalid API key) and a 404 (model not found).
-- In a live demo, fake questions could be shown without anyone noticing.
+When the AI request failed because of an invalid API key, an unavailable model, or a network issue, the code quietly generated sample questions such as "Sample question 1" and "Correct answer 1".
 
-**How I found it:**
-I generated a quiz on "generative AI" and got "Sample question 1…" instead of real questions. The backend terminal showed `AI failed: 401 Invalid API Key → fallback`.
+These questions were then saved and displayed as if the quiz had been generated successfully.
+
+**Why it was a problem:**
+
+- The application appeared to work even when the AI service was failing.
+- The actual error was only visible in the backend terminal.
+- It hid real errors, including a 401 invalid API key and a 404 model not found response.
+- Students could receive fake questions without knowing that something went wrong.
 
 **How I fixed it:**
-- When the AI fails, the code now throws a clear error instead of making fake questions.
-- The student sees: *"Quiz generation failed. Please try again."* (status 502).
-- Nothing is saved in the database when the AI fails.
-- Fake questions are only used if a developer turns them on on purpose with `AI_FALLBACK=true` in `.env`.
+
+- Removed automatic fake-question generation when an AI request fails.
+- Added clear error handling instead of silently returning sample questions.
+- The student now receives: "Quiz generation failed. Please try again."
+- AI failures return a 502 response.
+- Nothing is saved when AI generation fails.
+- Fake fallback questions can only be enabled intentionally using `AI_FALLBACK=true` in `.env`.
 
 **Evidence:**
-- Before: 
-![alt text](image.png)
-![alt text](image-1.png)
-- After: 
-![alt text](image-2.png)
-![alt text](image-3.png)
 
-### Problem 2: Topic/PDF Mode Detected by Text Length (Non-Trivial problem Found by me) 
+- Before: `image.png`, `image-1.png`
+- After: `image-2.png`, `image-3.png`
+
+### Problem 2: Topic/PDF Mode Was Detected Using Text Length
 
 **File:** `backend/services/aiService.js`
 
 **What was wrong:**
-The AI-suggested code decided whether the input was a topic or a PDF using its length:
+
+The AI-generated code used the length of the input text to decide whether the source was a topic or a PDF.
 
 ```javascript
 const isLecture = source.length > 200;
 ```
 
+This approach was unreliable because a topic could contain more than 200 characters, while a PDF could contain very little extracted text.
+
 **Why it was a problem:**
-- A short PDF (200 characters or less) would be treated as a topic, so the AI would use general knowledge instead of the lecture content.
-- The code secretly depended on the 200-character topic limit in another file (`validate.js`). If someone changed that limit, mode detection would break without any warning.
+
+- A short PDF could be treated as a topic.
+- The AI might use general knowledge instead of the uploaded lecture.
+- The logic depended on an unrelated text-length limit in `validate.js`.
 
 **How I found it:**
-While reviewing the AI's suggested code, I noticed that text length is not a reliable way to know where the input came from.
 
-**My prompt to the AI:**
-> "A topic can be longer than 200 characters and a PDF can contain less than 200 characters. So source length is not a reliable way to identify the mode. Please revise your solution to use an explicit `sourceType` value."
+While reviewing the generated code, I noticed that the length of the text could not reliably identify where the content came from.
+
+**My prompt to AI:**
+
+> A topic can be longer than 200 characters and a PDF can contain less than 200 characters. So source length is not a reliable way to identify the mode. Please revise your solution to use an explicit `sourceType` value.
 
 **How I fixed it:**
-- The route now passes `sourceType: file ? "pdf" : "topic"` to the AI service.
-- The server decides the mode based on whether a file was actually uploaded, so the user cannot fake it.
+
+- Updated the route to pass `sourceType` explicitly.
+- The backend now identifies PDF mode using the uploaded file.
+- Topic mode is used when no file is uploaded.
 - The frontend did not need any changes.
 
-**Evidence:**
-Before
-![alt text](image.png)
-![alt text](image-2.png)
-After
-![alt text](image-3.png)
-![alt text](image-4.png)
----
+The route now uses:
 
-### Problem 3: Empty PDF Returned Server Error 500 Instead of 400 (Non-Trivial problem Found by me) 
+```javascript
+sourceType: file ? "pdf" : "topic"
+```
+
+**Evidence:**
+
+- Before: `image.png`, `image-2.png`
+- After: `image-3.png`, `image-4.png`
+
+### Problem 3: Empty PDF Returned 500 Instead of 400
 
 **Files:** `backend/services/pdfService.js`, `backend/middleware/errorHandler.js`
 
 **What was wrong:**
-`pdfService.js` threw an error without a status code:
+
+The PDF service threw an error without assigning an HTTP status code when a PDF contained no readable text.
 
 ```javascript
 if (!text) throw new Error("PDF has no readable text");
 ```
 
-The error handler uses `err.status || 500`, so an empty PDF was reported as **500 (server error)**.
+The error handler used `err.status || 500`, so the application treated this user input problem as an internal server error.
 
 **Why it was a problem:**
-- An empty PDF is the user's mistake, so it should be **400 (bad request)**, not 500.
-- Wrong status codes make debugging and monitoring confusing.
-- In production mode, the error handler would replace the message with "Server error", so the student would not know what went wrong.
 
-**How I found it:**
-I tested with an empty PDF and image-only PDF and checked how the error was handled between the two files.
+- An unreadable PDF is an input problem, not necessarily a server failure.
+- A 500 response makes debugging and monitoring less clear.
+- In production, the error handler could replace the useful message with a generic server error.
 
 **How I fixed it:**
-- Empty PDFs now return **400** with "PDF has no readable text".
-- Damaged or password-protected PDFs now return **400** with a clear message.
-- AI failures return **502**, and missing AI setup returns **503**.
-- The error handler now hides only unexpected 500 errors in production, and keeps helpful messages for other errors.
+
+- Empty PDFs now return 400 with a clear message.
+- Damaged or password-protected PDFs return 400.
+- AI generation failures return 502.
+- Missing AI configuration returns 503.
+- The error handler hides unexpected internal 500 errors in production while keeping useful messages for expected client errors.
 
 **Evidence:**
-Before
-![alt text](image.png)
-After
-![alt text](image-1.png)
 
-### Problem 4: Frontend Was Never Connected to the Backend
+- Before: `image.png`
+- After: `image-1.png`
+
+### Problem 4: Frontend Was Still Using Mock Data
 
 **File:** `frontend/src/api/quizApi.js`
 
 **What was wrong:**
-- `USE_MOCK = true`, so the frontend always used sample data.
-- The backend URL still had a placeholder: `http://localhost:[PORT]/api`.
-- Every quiz showed the same 5 operating system questions, no matter which topic or number of questions was chosen.
+
+The frontend was still running in mock mode, meaning it never sent quiz generation requests to the backend.
+
+The configuration also contained an incomplete backend URL.
+
+```javascript
+const USE_MOCK = true;
+```
 
 **How I found it:**
-I entered "generative AI" with 10 questions but got 5 questions about operating systems. The backend terminal showed no activity, and the quiz ID in the URL was a timestamp, which proved the request never reached the backend.
+
+I entered "generative AI" and selected 10 questions, but the application displayed the same five operating system questions. The backend terminal showed no request activity.
 
 **How I fixed it:**
-- Set `USE_MOCK = false`
-- Set `API_BASE_URL = "http://localhost:5000/api"`
+
+Updated the configuration:
+
+```javascript
+const USE_MOCK = false;
+const API_BASE_URL = "http://localhost:5000/api";
+```
+
+Now, the frontend sends requests to the actual backend instead of returning sample data.
 
 **Evidence:**
-Before: ![alt text](image.png)
-After: ![alt text](image-1.png)
+
+- Before: `p4-before-os-questions.png`
+- After: `p4-after-real-questions.png`
 
 ### Problem 5: Correct Answer Position Bias
 
 **File:** `backend/services/aiService.js`
 
 **What was wrong:**
-The original prompt example showed `"correctIndex": 0`. AI models tend to copy examples and often put the correct answer first, so students could guess by always choosing option A.
 
-**Why a prompt alone cannot fix it:**
-AI models are not good at real randomness. Even when asked to vary positions, they still follow patterns.
+The original AI prompt included an example where `correctIndex` was always `0`. This could encourage the model to place the correct answer first.
+
+As a result, students might notice a pattern and guess option A more frequently.
 
 **How I fixed it:**
-Added a `shuffleOptions()` function that randomly reorders the 4 options in code (Fisher-Yates shuffle) and updates `correctIndex` to the new position of the correct answer.
 
-**Evidence:**
+I added a `shuffleOptions()` function using the Fisher-Yates shuffle algorithm.
 
-Generated 4 quizzes (35 questions). The terminal printed the AI's positions and the positions after shuffling.
+It randomly changes the order of the four options and updates `correctIndex` so that it still points to the correct answer after shuffling.
 
-| Position | Before shuffle (AI) | After shuffle (code) |
-|---|---|---|
+**Testing and evidence:**
+
+Generated four quizzes containing 35 questions and compared the correct answer positions before and after shuffling.
+
+| Position | Before Shuffle (AI) | After Shuffle (Code) |
+|---|---:|---:|
 | 0 (A) | 11 (31%) | 6 (17%) |
 | 1 (B) | 13 (37%) | 9 (26%) |
 | 2 (C) | 6 (17%) | 10 (29%) |
 | 3 (D) | 5 (14%) | 10 (29%) |
-| A + B together | **24 (69%)** | 15 (43%) |
+| A + B Together | **24 (69%)** | **15 (43%)** |
 
-![alt text](image-1.png)
-![alt text](image-2.png)
-![alt text](image-3.png)
+The results showed that the correct answers were more evenly distributed after shuffling.
 
-### Problem 6: Hidden Default Model Did Not Match the Provider (Non-Trivial problem Found by me) 
+**Evidence:** `image-1.png`, `image-2.png`, `image-3.png`
+
+### Problem 6: Default AI Model Did Not Match the Selected Provider
 
 **File:** `backend/services/aiService.js`
 
 **What was wrong:**
 
+The code still had an OpenAI model as its default:
+
 ```javascript
 const AI_MODEL = process.env.AI_MODEL || "gpt-4o-mini";
 ```
 
-We switched to Groq, but the default was still an OpenAI model. If `AI_MODEL` was missing in `.env`, the app would ask Groq for a model it doesn't have and fail with a confusing 404 error.
+After switching to Groq, this default could cause problems if `AI_MODEL` was missing from `.env`.
+
+Groq might receive a model name that was not available through its API.
 
 **How I fixed it:**
-- Removed the hidden default.
-- If the model is missing, the student gets a clear message (503), and the terminal says exactly what is missing.
-- The backend startup now shows the active model.
+
+- Removed the misleading default model.
+- Added a configuration check when the model is missing.
+- The backend now returns a clear 503 response when the required model configuration is unavailable.
+- Added the active model to the startup information.
+
+This made the provider configuration easier to understand and troubleshoot.
 
 ---
-## Frontend/Backend Mismatches
 
-### Mismatch 1: Frontend Still Using Mock Data
+## 4. Frontend/Backend Mismatches
 
-**Problem:** `quizApi.js` still had `USE_MOCK = true` and a placeholder URL (`localhost:[PORT]`). The frontend never called the backend, so every quiz showed the same 5 operating system questions, whatever the topic or count.
+### Mismatch 1: Frontend Was Not Connected to the Backend
 
-**How I found it:** I entered "generative AI" with 10 questions and got 5 OS questions. The backend terminal showed no activity.
+**File:** `frontend/src/api/quizApi.js`
+
+**Problem:**
+
+The frontend still had `USE_MOCK = true` and an incomplete backend URL. This meant the frontend was using sample quizzes instead of communicating with the actual backend.
+
+**How I found it:**
+
+After entering a new topic and selecting 10 questions, the application still displayed five operating system questions. The backend terminal showed no incoming request.
 
 **Fix:**
+
 ```javascript
 const USE_MOCK = false;
 const API_BASE_URL = "http://localhost:5000/api";
 ```
 
-![Before](p4-before-os-questions.png)
-![After](p4-after-real-questions.png)
+This connected the frontend to the local backend.
 
----
+**Evidence:**
+
+- Before: `p4-before-os-questions.png`
+- After: `p4-after-real-questions.png`
 
 ### Mismatch 2: Missing API Key Header
 
-**Problem:** The backend requires an `x-api-key` header for create, rename and delete, but the frontend did not send it. Both sides worked alone but did not agree, so these requests were rejected (401).
+**Problem:**
 
-**Fix:** Added the header once to the shared axios instance, so every request sends it:
+The backend required an `x-api-key` header for quiz creation, renaming, and deletion. However, the frontend was not sending this header.
+
+Both sides worked separately, but the requests were rejected with a 401 Unauthorized response.
+
+**Fix:**
+
+Added the application key to the shared Axios instance so that all requests use the same configuration.
+
 ```javascript
 const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: { "x-api-key": import.meta.env.VITE_API_KEY },
+  headers: {
+    "x-api-key": import.meta.env.VITE_API_KEY
+  }
 });
 ```
-`VITE_API_KEY` in `frontend/.env` must match `API_KEY` in `backend/.env`.
+
+The `VITE_API_KEY` in `frontend/.env` must match the `API_KEY` configured in `backend/.env`.
+
+**Security note:** A Vite environment variable is included in frontend code and can be inspected by users. This header should not be treated as a secure way to protect production API access. Proper backend authentication and authorization are needed for production.
 
 ---
 
-## Other Problems Solved
+## 5. Other Problems Solved
 
-| Problem | Fix |
+| Problem | What We Changed |
 |---|---|
-| Auth could switch off silently when `API_KEY` was missing | Restored the safe check: no key → requests rejected with a clear error |
-| Startup message said "API key" but only checked the app key | Startup now shows App key, AI key and Model separately |
-| Damaged or password-protected PDFs gave confusing 500 errors | Now return 400: "Could not read this PDF. It may be damaged or password-protected." |
-| OpenAI API is paid | Made the provider configurable (`AI_BASE_URL`, `AI_MODEL`) and switched to free Groq |
-| Model `llama-3.3-70b-versatile` returned 404 | Listed the provider's available models and chose `openai/gpt-oss-120b` |
+| Authentication could switch off silently when `API_KEY` was missing. | Restored the application's API key check so that requests are rejected when the key is not configured. |
+| Startup message only checked the application key but was confused with the AI key. | Updated startup information to show the application key, AI key, and model separately. |
+| Damaged or password-protected PDFs returned confusing 500 errors. | Updated the handling to return a 400 response with a clearer message. |
+| OpenAI API required a paid plan. | Made the AI provider configurable using `AI_BASE_URL` and `AI_MODEL`, then switched to Groq. |
+| The suggested Groq model was unavailable. | Checked the available models and selected `openai/gpt-oss-120b`. |
+| AI failures were hidden behind sample questions. | Improved error handling and stopped automatic fallback generation. |
 
-## Prompt Improvement (Version 1 → Version 2)
+---
 
-**Problems with the original prompt (V1):**
-- No difference between topic mode and PDF mode
-- Difficulty was just one word ("Easy", "Hard") with no meaning
-- No rules for good wrong options
-- Example showed `correctIndex: 0` (caused answer bias)
-- No protection against instructions hidden inside PDF text
+## 6. Prompt Improvement (Version 1 vs Version 2)
 
-**Improvements in the new prompt (V2):**
-- System message with clear rules + user message with the inputs
-- Topic mode uses general knowledge; PDF mode uses only the lecture content
-- Difficulty defined: Easy = recall, Medium = understanding/application, Hard = analysis/reasoning
-- Rules for believable wrong options, no "All of the above"
-- No duplicate or unclear questions
-- Useful 1–2 sentence explanations
-- Lecture text placed inside `<lecture_content>` tags and treated as study material only
+### Problems with the Original Prompt (V1)
 
+The original prompt did not provide enough guidance for generating reliable study questions.
 
-## Vague vs Detailed Prompt (UI component: QuizForm)
+The main issues were:
 
-- **Vague prompt:** "Create a quiz generator form in React. The user should be able to type a topic or upload a PDF, pick a difficulty level and how many questions they want, then press a button to generate the quiz."
+- It did not clearly separate topic-based and PDF-based generation.
+- Difficulty levels were mentioned without explaining what Easy, Medium, and Hard should mean.
+- There were no proper instructions for creating believable wrong options.
+- The example used `correctIndex: 0`, which could encourage answer position bias.
+- It did not explain how to handle instructions that might appear inside uploaded PDF content.
 
-- **Detailed prompt:** Asked to rebuild the same form with clear requirements: send the PDF as "file"; topic of at least 3 characters; PDF only and max 5 MB; show the selected file name with a Remove button; labels linked with htmlFor/id; aria-pressed on the Enter Topic / Upload PDF toggle; role="alert" for errors; keyboard support with :focus-visible; WCAG AA contrast on a dark background; a mobile media query with margin from the screen edges and full-width fields; left-aligned labels; "Generating..." with the whole form disabled using a fieldset; and clearing the error when the user changes the input.
+### Improvements in the New Prompt (V2)
 
-- **Differences:**
-  - **Data:** the vague version sent the PDF as "pdf" (did not match our API contract); the detailed version sends it as "file".
-  - **Validation:** the vague version had no file size limit and accepted a 1-letter topic; the detailed version rejects PDFs over 5 MB, needs at least 3 characters and shows the file name with a Remove button.
-  - **Accessibility:** in the vague version errors were not announced to screen readers, the selected tab was shown only by colour, there was no clear focus style and labels had low contrast; the detailed version uses role="alert", aria-pressed, a yellow :focus-visible outline and high-contrast left-aligned labels.
-  - **Responsiveness:** on mobile the vague form touched the screen edges and had the same spacing as on a laptop; the detailed version keeps a margin from the edges, stacks all fields at full width and uses smaller padding.
-  - **State:** both showed "Generating..."; the detailed version also disables the whole form while loading and clears the error as soon as the user changes the input.
+The updated prompt included clearer instructions for generating better questions.
 
-- **UI problem fixed:** the form touched the screen edges on mobile and labels were hard to read; fixed with a mobile media query, left-aligned labels and better contrast.
+- Separate instructions for topic mode and PDF mode.
+- Topic mode uses general knowledge, while PDF mode uses the uploaded lecture content.
+- Easy questions focus on recall.
+- Medium questions focus on understanding and application.
+- Hard questions focus on analysis and reasoning.
+- Wrong options should be believable and related to the question.
+- Duplicate and unclear questions should be avoided.
+- Each question should include a useful explanation of one or two sentences.
+- Lecture content is placed inside `<lecture_content>` tags and treated as study material, not as instructions.
 
-- **Screenshots:** docs/screenshots/vague-desktop.png, docs/screenshots/vague-mobile.png, docs/screenshots/detailed-desktop.png, docs/screenshots/detailed-mobile.png
+These changes gave the AI clearer expectations and improved the structure and quality of generated questions.
+
+---
+
+## 7. Vague vs Detailed Prompt (QuizForm)
+
+### Original Vague Prompt
+
+> Create a quiz generator form in React. The user should be able to type a topic or upload a PDF, pick a difficulty level and how many questions they want, then press a button to generate the quiz.
+
+### Improved Detailed Prompt
+
+The updated prompt asked AI to rebuild the same form with specific requirements for data handling, validation, accessibility, responsiveness, and state management.
+
+It included:
+
+- Send uploaded PDFs using the `file` field to match the backend API contract.
+- Require a topic of at least three characters.
+- Allow PDF uploads only, with a maximum file size of 5 MB.
+- Display the selected file name with a Remove button.
+- Connect labels with their input fields using `htmlFor` and `id`.
+- Use `aria-pressed` for the Enter Topic and Upload PDF tabs.
+- Announce errors using `role="alert"`.
+- Add a visible keyboard focus style using `:focus-visible`.
+- Maintain WCAG AA colour contrast.
+- Keep labels left-aligned and easy to read.
+- Add mobile styling with proper screen margins and full-width fields.
+- Display "Generating..." while the request is processing.
+- Disable the complete form during loading using a fieldset.
+- Clear previous errors when the user changes an input.
+
+### Main Differences
+
+| Area | Vague Prompt | Detailed Prompt |
+|---|---|---|
+| Data Handling | Sent PDF using the wrong field name, `pdf`. | Uses the correct `file` field. |
+| Validation | No PDF size limit and accepted very short topics. | Checks file type, 5 MB limit, and minimum topic length. |
+| Accessibility | Missing screen-reader announcements and clear focus styles. | Uses `role="alert"`, `aria-pressed`, labels, and keyboard focus styling. |
+| Responsiveness | Form spacing was not properly adjusted for mobile. | Adds mobile margins, full-width fields, and smaller padding. |
+| State Management | Displayed a loading message. | Also disables the complete form during generation and clears old errors when inputs change. |
+
+**UI issue fixed:** The original form touched the screen edges on mobile and had labels that were difficult to read. These issues were improved with responsive styling, left-aligned labels, and better contrast.
+
+**Screenshots:**
+
+- `docs/screenshots/vague-desktop.png`
+- `docs/screenshots/vague-mobile.png`
+- `docs/screenshots/detailed-desktop.png`
+- `docs/screenshots/detailed-mobile.png`
+
+---
+
+## 8. Prompt Log – QuizGenie (Database and Quiz Management)
+
+**Member: Anfal**
+
+| # | Prompt (Short) | What AI Provided | What Was Wrong | How We Fixed It |
+|---|---|---|---|---|
+| 1 | Review `schema.sql` and `db.js` for a SQLite database managing quizzes, questions, and attempts. | AI provided a database structure with three tables, foreign keys, and cascade deletion. | I did not find any major issue in the generated schema. | I checked the table relationships and tested that deleting a quiz also removes its related questions and attempts. |
+| 2 | Write the `createQuiz` function in `quizModel.js` to save a quiz and its questions. | AI generated a function that first saved the quiz and then inserted its questions one by one. | **Non-trivial issue:** If something went wrong while saving the questions, the quiz could still be saved without all its questions. | I fixed this by using `db.transaction()` from `better-sqlite3`, so the complete quiz is saved together or rolled back if an error occurs. |
+| 3 | Review `validate.js` and `quizRoutes.js` for input validation. | AI added checks for the topic, difficulty, and number of questions. | **Non-trivial issue:** PDF uploads could fail because the validator was checking the topic even when a file was provided. | I updated the condition to skip topic validation when `req.file` is available. |
+| 4 | Review `evaluationService.js` for calculating quiz scores. | AI generated a function to compare submitted answers with the correct answers and calculate the final score. | **Non-trivial issue:** The function did not check whether the user had submitted answers for all questions. | I added a check to compare the submitted answer count with the total number of questions before calculating the score. |
+| 5 | How to prevent SQL injection in `quizModel.js`. | AI suggested using parameterized queries with `?` placeholders. | I checked the existing queries and did not find a major issue with SQL injection protection. | I verified that the database queries use prepared statements and parameterized values. |
+
+---
+
+## 9. Problems Found and Fixed in AI-Generated Code (Database and Quiz Management)
+
+### Problem 1: Quiz Could Be Saved Without All Its Questions
+
+**File:** `backend/models/quizModel.js`
+
+**What was wrong:**
+
+While reviewing the generated function, I noticed that it saved the quiz first and then added questions one by one. If an error occurred halfway through, the quiz could remain saved with only some of its questions.
+
+**Why it mattered:**
+
+- A quiz could be stored without all its questions.
+- Students might see incomplete quizzes.
+- It could leave inconsistent data in the database.
+
+**How I fixed it:**
+
+I used `db.transaction()` from `better-sqlite3`. Now, either the quiz and all its questions are saved successfully, or the database rolls back the changes if something goes wrong.
+
+```javascript
+const tx = db.transaction(() => {
+  const info = insertQuiz.run(
+    title,
+    topic,
+    difficulty,
+    numQuestions,
+    createdAt
+  );
+
+  const quizId = info.lastInsertRowid;
+
+  for (const q of questions) {
+    insertQuestion.run(
+      quizId,
+      q.text,
+      JSON.stringify(q.options),
+      q.correctIndex,
+      q.explanation || ""
+    );
+  }
+
+  return quizId;
+});
+```
+
+### Problem 2: PDF Upload Was Blocked by Topic Validation
+
+**File:** `backend/middleware/validate.js`
+
+**What was wrong:**
+
+During code review, I found that topic validation was also running when a user uploaded a PDF. Since the topic field could be empty in this case, the backend rejected an otherwise valid upload.
+
+**Why it mattered:**
+
+- Users could face errors while generating quizzes from PDFs.
+- The application asked for a topic even when the user had already provided a PDF.
+
+**How I fixed it:**
+
+I changed the validation condition so that topic validation only runs when no file has been uploaded.
+
+```javascript
+if (!req.file && topic !== undefined) {
+  // Topic validation
+}
+```
+
+After this change, users can upload PDFs without being blocked by unnecessary topic validation.
+
+### Problem 3: Backend Accepted Incomplete Quiz Answers
+
+**File:** `backend/services/evaluationService.js`
+
+**What was wrong:**
+
+While checking the score calculation, I noticed that the backend was not checking the total number of submitted answers. For example, a quiz with five questions could receive only two answers and still be processed.
+
+**Why it mattered:**
+
+- The application could calculate an incorrect score.
+- Incomplete attempts could be saved.
+- A user could potentially manipulate the evaluation by sending incomplete answers.
+
+**How I fixed it:**
+
+I added a condition at the beginning of `evaluateAnswers()` to make sure that every question has a corresponding submitted answer.
+
+```javascript
+export function evaluateAnswers(questions, submittedAnswers) {
+  if (submittedAnswers.length !== questions.length) {
+    const err = new Error(
+      `Incomplete answers. Expected ${questions.length}, got ${submittedAnswers.length}`
+    );
+
+    err.status = 400;
+    throw err;
+  }
+
+  // Remaining evaluation logic
+}
+```
+
+Now, if the submitted answer count does not match the total number of questions, the backend returns a 400 Bad Request response instead of calculating an incorrect score.
+
+### Problem 4: Database Errors Were Difficult to Understand
+
+**File:** `backend/middleware/errorHandler.js`
+
+**What was wrong:**
+
+I also noticed that the error handler returned the same generic message, "Invalid data", whenever a SQLite constraint error occurred.
+
+```javascript
+if (err.code === "SQLITE_CONSTRAINT") {
+  return res.status(400).json({
+    error: "Invalid data"
+  });
+}
+```
+
+This did not give much information about what the user needed to correct.
+
+**Why it mattered:**
+
+- Users could not easily understand why their data was rejected.
+- It made database errors harder to investigate.
+- The error message did not provide useful guidance.
+
+**How I fixed it:**
+
+I updated the message to give users a better idea of which fields might need checking.
+
+```javascript
+if (err.code === "SQLITE_CONSTRAINT") {
+  return res.status(400).json({
+    error: "Invalid data format. Please check difficulty, number of questions, or options."
+  });
+}
+```
+
+This makes database-related errors easier to understand and helps users identify possible input problems.
+
+---
+
+## 10. Summary of Anfal's Database and Quiz Management Contribution
+
+I worked on reviewing the database structure and making the quiz management process more reliable. During the code review, I found a few issues that were not obvious in the initial AI-generated code.
+
+My main contributions included:
+
+- Checking database tables and their relationships.
+- Making sure quizzes and their questions are saved together.
+- Fixing validation issues with PDF uploads.
+- Preventing incomplete answer submissions during score calculation.
+- Checking SQL queries for possible injection risks.
+- Making database error messages more helpful.
+
+These improvements helped make quiz saving, PDF uploads, and result evaluation more reliable.
+
+---
+
+## 11. Overall Project Learning and Conclusion
+
+Working on QuizGenie gave our team an opportunity to use AI for frontend development, backend integration, database management, and code review.
+
+Although AI helped us generate code and explain different parts of the project, its suggestions were not always correct or ready to use. We had to review the generated code, compare it with our API contract, run tests, and fix issues manually.
+
+Some of the important things we learned during this process were:
+
+- A detailed prompt usually produces more useful code than a vague instruction.
+- AI-generated code should always be checked before using it in a project.
+- Testing is important because some problems only appear when different parts of the application work together.
+- Error handling should show meaningful messages instead of hiding failures.
+- Backend validation is important even when the frontend already checks user input.
+- Database transactions help protect data when multiple related records are saved.
+- Accessibility and responsive design should be considered during development, not added only at the end.
+- AI tools are helpful for development, but the final decisions and testing still require developer involvement.
+
