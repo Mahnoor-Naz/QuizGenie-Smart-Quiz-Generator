@@ -100,7 +100,7 @@ Open the local link shown in the terminal in your browser.
 | [Name] | Backend Developer | [Responsibilities] |
 | Eman Ansar | AI Integration | Connected the frontend to the backend; designed and improved the AI prompt (topic & PDF modes, difficulty levels, answer rules); set up Groq (`openai/gpt-oss-120b`) via configurable `.env`; fixed silent fallback, error status codes (400/502/503), mode detection (`sourceType`) and answer position bias (shuffle); maintained the prompt log with before/after evidence |
 | [Name] | Database and Quiz Management | [Responsibilities] |
-| [Name] | Quiz Evaluation, Testing and Integration | [Responsibilities] |
+| Kashaf | Quiz Evaluation, Testing and Integration | Tested all seven backend API operations using Postman (Get All Quizzes, Create Quiz, Get Quiz by ID, Rename Quiz, Submit Quiz Attempt, Quiz Evaluation and Delete Quiz); verified API responses, authentication, quiz results (5/5, 100%), and documented testing evidence with screenshots.
 
 ## AI Assisted Development
 
