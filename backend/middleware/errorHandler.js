@@ -17,10 +17,13 @@ export function errorHandler(err, req, res, next) {
   }
   // SQLite constraint
   if (err.code === "SQLITE_CONSTRAINT") {
-    return res.status(400).json({ error: "Invalid data" });
+    // NAYA FIX: User ko saaf aur specific message dena
+    return res.status(400).json({ 
+      error: "Invalid data format. Please check difficulty, number of questions, or options." 
+    });
   }
 
-    const status = err.status || 500;
+  const status = err.status || 500;
   res.status(status).json({
     error: status === 500 && process.env.NODE_ENV === "production" ? "Server error" : err.message,
   });
