@@ -9,8 +9,8 @@ export function validateCreateQuiz(req, res, next) {
     return res.status(400).json({ error: "Please provide a topic or a PDF file" });
   }
 
-  // Topic diya hai to 3+ chars
-  if (topic !== undefined) {
+  // NAYA FIX: Topic validation sirf tab karein jab PDF upload NA hua ho
+  if (!req.file && topic !== undefined) {
     if (typeof topic !== "string" || topic.trim().length < 3) {
       return res.status(400).json({ error: "Topic must be at least 3 characters" });
     }

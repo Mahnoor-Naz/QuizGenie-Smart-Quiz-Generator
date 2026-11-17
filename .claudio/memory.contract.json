@@ -1,0 +1,441 @@
+{
+  "version": "1",
+  "workspaceId": "8ca0ee74ac3d35ed",
+  "workspaceName": "QuizGenie-Smart-Quiz-Generator",
+  "enabled": true,
+  "updatedAt": "2026-11-13T12:20:50.613Z",
+  "detectedStack": {
+    "languages": [
+      "JavaScript/TypeScript"
+    ],
+    "frameworks": [
+      "Express",
+      "React",
+      "Vite"
+    ],
+    "packageManager": "npm",
+    "uiLibraries": [],
+    "orm": [],
+    "authLibraries": [],
+    "validationLibraries": [],
+    "paymentLibraries": [],
+    "testTools": [],
+    "scripts": {
+      "backend/start": "node server.js",
+      "backend/dev": "node --watch server.js",
+      "backend/test": "node --test",
+      "frontend/dev": "vite",
+      "frontend/build": "vite build",
+      "frontend/lint": "eslint .",
+      "frontend/preview": "vite preview"
+    },
+    "importantDirs": [
+      "backend",
+      "frontend"
+    ],
+    "sensitiveFiles": []
+  },
+  "sections": {
+    "stack": [],
+    "packageManager": [],
+    "architectureRules": [],
+    "codingConventions": [],
+    "sensitiveFiles": [
+      {
+        "id": "133eb4a3b6f19024",
+        "text": "Environment file: backend/.env.example",
+        "kind": "risk",
+        "source": "repo_detected",
+        "confidence": "confirmed",
+        "scope": "workspace",
+        "evidence": {
+          "file": "backend/.env.example"
+        },
+        "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+      },
+      {
+        "id": "66049310d8401e75",
+        "text": "DB schema: backend/database/schema.sql",
+        "kind": "risk",
+        "source": "repo_detected",
+        "confidence": "confirmed",
+        "scope": "workspace",
+        "evidence": {
+          "file": "backend/database/schema.sql"
+        },
+        "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+      },
+      {
+        "id": "2b39acd5c7f07e73",
+        "text": "Auth code: backend/middleware/auth.js",
+        "kind": "risk",
+        "source": "repo_detected",
+        "confidence": "confirmed",
+        "scope": "workspace",
+        "evidence": {
+          "file": "backend/middleware/auth.js"
+        },
+        "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+      },
+      {
+        "id": "05703663d872dabf",
+        "text": "Environment file: backend/.env",
+        "kind": "risk",
+        "source": "repo_detected",
+        "confidence": "confirmed",
+        "scope": "workspace",
+        "evidence": {
+          "file": "backend/.env"
+        },
+        "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+      },
+      {
+        "id": "ccadf6ff989b258b",
+        "text": "Environment file: frontend/.env",
+        "kind": "risk",
+        "source": "repo_detected",
+        "confidence": "confirmed",
+        "scope": "workspace",
+        "evidence": {
+          "file": "frontend/.env"
+        },
+        "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+      }
+    ],
+    "forbiddenActions": [
+      {
+        "id": "c4826f201978360c",
+        "text": "Never log or commit values for env names: API_KEY, OPENAI_API_KEY, VITE_API_KEY.",
+        "kind": "constraint",
+        "source": "repo_detected",
+        "confidence": "confirmed",
+        "scope": "workspace",
+        "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+      }
+    ],
+    "allowedCommands": [
+      {
+        "id": "866b98a23d9ff55a",
+        "text": "npm run start (in backend) -> node server.js",
+        "kind": "command",
+        "source": "repo_detected",
+        "confidence": "confirmed",
+        "scope": "workspace",
+        "evidence": {
+          "file": "backend/package.json"
+        },
+        "appliesTo": [
+          "backend"
+        ],
+        "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+      },
+      {
+        "id": "fd357bcb4c9d768b",
+        "text": "npm run dev (in backend) -> node --watch server.js",
+        "kind": "command",
+        "source": "repo_detected",
+        "confidence": "confirmed",
+        "scope": "workspace",
+        "evidence": {
+          "file": "backend/package.json"
+        },
+        "appliesTo": [
+          "backend"
+        ],
+        "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+      },
+      {
+        "id": "e8f49b1a7f0ca3f7",
+        "text": "npm run test (in backend) -> node --test",
+        "kind": "command",
+        "source": "repo_detected",
+        "confidence": "confirmed",
+        "scope": "workspace",
+        "evidence": {
+          "file": "backend/package.json"
+        },
+        "appliesTo": [
+          "backend"
+        ],
+        "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+      },
+      {
+        "id": "114366436957f43d",
+        "text": "npm run dev (in frontend) -> vite",
+        "kind": "command",
+        "source": "repo_detected",
+        "confidence": "confirmed",
+        "scope": "workspace",
+        "evidence": {
+          "file": "frontend/package.json"
+        },
+        "appliesTo": [
+          "frontend"
+        ],
+        "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+      },
+      {
+        "id": "bd2916f51b4c88ba",
+        "text": "npm run build (in frontend) -> vite build",
+        "kind": "command",
+        "source": "repo_detected",
+        "confidence": "confirmed",
+        "scope": "workspace",
+        "evidence": {
+          "file": "frontend/package.json"
+        },
+        "appliesTo": [
+          "frontend"
+        ],
+        "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+      },
+      {
+        "id": "1eab19440593f539",
+        "text": "npm run lint (in frontend) -> eslint .",
+        "kind": "command",
+        "source": "repo_detected",
+        "confidence": "confirmed",
+        "scope": "workspace",
+        "evidence": {
+          "file": "frontend/package.json"
+        },
+        "appliesTo": [
+          "frontend"
+        ],
+        "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+      }
+    ],
+    "businessRules": [],
+    "integrationRules": [],
+    "testingExpectations": [],
+    "agentInstructions": [],
+    "openQuestions": []
+  },
+  "packages": [
+    {
+      "path": "backend",
+      "name": "quizgenie-backend",
+      "detectedStack": {
+        "languages": [
+          "JavaScript/TypeScript"
+        ],
+        "frameworks": [
+          "Express"
+        ],
+        "packageManager": "npm",
+        "uiLibraries": [],
+        "orm": [],
+        "authLibraries": [],
+        "validationLibraries": [],
+        "paymentLibraries": [],
+        "testTools": [],
+        "scripts": {
+          "start": "node server.js",
+          "dev": "node --watch server.js",
+          "test": "node --test"
+        },
+        "importantDirs": [],
+        "sensitiveFiles": []
+      },
+      "items": [
+        {
+          "id": "backend:fact:Project name: quizgenie-backend",
+          "text": "Project name: quizgenie-backend",
+          "kind": "fact",
+          "source": "repo_detected",
+          "confidence": "confirmed",
+          "scope": "package",
+          "evidence": {
+            "file": "backend/package.json"
+          },
+          "appliesTo": [
+            "backend"
+          ],
+          "lastVerifiedAt": "2026-11-13T12:20:50.612Z"
+        },
+        {
+          "id": "backend:fact:Framework detected: Express.",
+          "text": "Framework detected: Express.",
+          "kind": "fact",
+          "source": "repo_detected",
+          "confidence": "confirmed",
+          "scope": "package",
+          "evidence": {
+            "file": "backend/package.json"
+          },
+          "appliesTo": [
+            "backend"
+          ],
+          "lastVerifiedAt": "2026-11-13T12:20:50.612Z"
+        },
+        {
+          "id": "backend:command:npm run start -> node server.js",
+          "text": "npm run start -> node server.js",
+          "kind": "command",
+          "source": "repo_detected",
+          "confidence": "confirmed",
+          "scope": "package",
+          "evidence": {
+            "file": "backend/package.json"
+          },
+          "appliesTo": [
+            "backend"
+          ],
+          "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+        },
+        {
+          "id": "backend:command:npm run dev -> node --watch server.js",
+          "text": "npm run dev -> node --watch server.js",
+          "kind": "command",
+          "source": "repo_detected",
+          "confidence": "confirmed",
+          "scope": "package",
+          "evidence": {
+            "file": "backend/package.json"
+          },
+          "appliesTo": [
+            "backend"
+          ],
+          "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+        },
+        {
+          "id": "backend:command:npm run test -> node --test",
+          "text": "npm run test -> node --test",
+          "kind": "command",
+          "source": "repo_detected",
+          "confidence": "confirmed",
+          "scope": "package",
+          "evidence": {
+            "file": "backend/package.json"
+          },
+          "appliesTo": [
+            "backend"
+          ],
+          "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+        }
+      ]
+    },
+    {
+      "path": "frontend",
+      "name": "frontend",
+      "detectedStack": {
+        "languages": [
+          "JavaScript/TypeScript"
+        ],
+        "frameworks": [
+          "React",
+          "Vite"
+        ],
+        "packageManager": "npm",
+        "uiLibraries": [],
+        "orm": [],
+        "authLibraries": [],
+        "validationLibraries": [],
+        "paymentLibraries": [],
+        "testTools": [],
+        "scripts": {
+          "dev": "vite",
+          "build": "vite build",
+          "lint": "eslint .",
+          "preview": "vite preview"
+        },
+        "importantDirs": [
+          "src"
+        ],
+        "sensitiveFiles": []
+      },
+      "items": [
+        {
+          "id": "frontend:fact:Project name: frontend",
+          "text": "Project name: frontend",
+          "kind": "fact",
+          "source": "repo_detected",
+          "confidence": "confirmed",
+          "scope": "package",
+          "evidence": {
+            "file": "frontend/package.json"
+          },
+          "appliesTo": [
+            "frontend"
+          ],
+          "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+        },
+        {
+          "id": "frontend:fact:Framework detected: React.",
+          "text": "Framework detected: React.",
+          "kind": "fact",
+          "source": "repo_detected",
+          "confidence": "confirmed",
+          "scope": "package",
+          "evidence": {
+            "file": "frontend/package.json"
+          },
+          "appliesTo": [
+            "frontend"
+          ],
+          "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+        },
+        {
+          "id": "frontend:fact:Framework detected: Vite.",
+          "text": "Framework detected: Vite.",
+          "kind": "fact",
+          "source": "repo_detected",
+          "confidence": "confirmed",
+          "scope": "package",
+          "evidence": {
+            "file": "frontend/package.json"
+          },
+          "appliesTo": [
+            "frontend"
+          ],
+          "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+        },
+        {
+          "id": "frontend:command:npm run dev -> vite",
+          "text": "npm run dev -> vite",
+          "kind": "command",
+          "source": "repo_detected",
+          "confidence": "confirmed",
+          "scope": "package",
+          "evidence": {
+            "file": "frontend/package.json"
+          },
+          "appliesTo": [
+            "frontend"
+          ],
+          "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+        },
+        {
+          "id": "frontend:command:npm run build -> vite build",
+          "text": "npm run build -> vite build",
+          "kind": "command",
+          "source": "repo_detected",
+          "confidence": "confirmed",
+          "scope": "package",
+          "evidence": {
+            "file": "frontend/package.json"
+          },
+          "appliesTo": [
+            "frontend"
+          ],
+          "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+        },
+        {
+          "id": "frontend:command:npm run lint -> eslint .",
+          "text": "npm run lint -> eslint .",
+          "kind": "command",
+          "source": "repo_detected",
+          "confidence": "confirmed",
+          "scope": "package",
+          "evidence": {
+            "file": "frontend/package.json"
+          },
+          "appliesTo": [
+            "frontend"
+          ],
+          "lastVerifiedAt": "2026-11-13T12:20:50.613Z"
+        }
+      ]
+    }
+  ]
+}
