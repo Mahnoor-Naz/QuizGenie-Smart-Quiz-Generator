@@ -521,73 +521,150 @@ Now, if the submitted answer count does not match the total number of questions,
 
 **File:** `backend/middleware/errorHandler.js`
 
-**What was wrong:**
+**\*\*What was wrong:\*\***
 
-I also noticed that the error handler returned the same generic message, "Invalid data", whenever a SQLite constraint error occurred.
+\`\`\`javascript
+const AI_MODEL = process.env.AI_MODEL || "gpt-4o-mini";
+\`\`\`
 
-```javascript
-if (err.code === "SQLITE_CONSTRAINT") {
-  return res.status(400).json({
-    error: "Invalid data"
-  });
-}
-```
+We switched to Groq, but the default was still an OpenAI model. If \`AI_MODEL\` was missing in \`.env\`, the app would ask Groq for a model it doesn't have and fail with a confusing 404 error.
 
-This did not give much information about what the user needed to correct.
+**\*\*How I fixed it:\*\***
 
-**Why it mattered:**
+\- Removed the hidden default.
 
-- Users could not easily understand why their data was rejected.
-- It made database errors harder to investigate.
-- The error message did not provide useful guidance.
+\- If the model is missing, the student gets a clear message (503), and the terminal says exactly what is missing.
 
-**How I fixed it:**
+\- The backend startup now shows the active model.
 
-I updated the message to give users a better idea of which fields might need checking.
+\---
 
-```javascript
-if (err.code === "SQLITE_CONSTRAINT") {
-  return res.status(400).json({
-    error: "Invalid data format. Please check difficulty, number of questions, or options."
-  });
-}
-```
+**## Frontend/Backend Mismatches**
 
-This makes database-related errors easier to understand and helps users identify possible input problems.
+**### Mismatch 1: Frontend Still Using Mock Data**
+
+**\*\*Problem:\*\*** \`quizApi.js\` still had \`USE_MOCK = true\` and a placeholder URL (\`localhost:[PORT]\`). The frontend never called the backend, so every quiz showed the same 5 operating system questions, whatever the topic or count.
+
+**\*\*How I found it:\*\*** I entered "generative AI" with 10 questions and got 5 OS questions. The backend terminal showed no activity.
+
+**\*\*Fix:\*\***
+
+\`\`\`javascript
+const USE_MOCK = false;
+const API_BASE_URL = "http://localhost:5000/api";
+\`\`\`
+
+![Before]\(p4-before-os-questions.png)
+
+![After]\(p4-after-real-questions.png)
+
+\---
+
+**### Mismatch 2: Missing API Key Header**
+
+**\*\*Problem:\*\*** The backend requires an \`x-api-key\` header for create, rename and delete, but the frontend did not send it. Both sides worked alone but did not agree, so these requests were rejected (401).
+
+**\*\*Fix:\*\*** Added the header once to the shared axios instance, so every request sends it:
+
+\`\`\`javascript
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: { "x-api-key": import.meta.env.VITE_API_KEY },
+});
+\`\`\`
+
+\`VITE_API_KEY\` in \`frontend/.env\` must match \`API_KEY\` in \`backend/.env\`.
+
+\---
+
+**## Other Problems Solved**
+
+\| Problem | Fix |
+\|---|---|
+\| Auth could switch off silently when \`API_KEY\` was missing | Restored the safe check: no key → requests rejected with a clear error |
+\| Startup message said "API key" but only checked the app key | Startup now shows App key, AI key and Model separately |
+\| Damaged or password-protected PDFs gave confusing 500 errors | Now return 400: "Could not read this PDF. It may be damaged or password-protected." |
+\| OpenAI API is paid | Made the provider configurable (\`AI_BASE_URL\`, \`AI_MODEL\`) and switched to free Groq |
+\| Model \`llama-3.3-70b-versatile\` returned 404 | Listed the provider's available models and chose \`openai/gpt-oss-120b\` |
+
+**## Prompt Improvement (Version 1 → Version 2)**
+
+**\*\*Problems with the original prompt (V1):\*\***
+
+\- No difference between topic mode and PDF mode
+
+\- Difficulty was just one word ("Easy", "Hard") with no meaning
+
+\- No rules for good wrong options
+
+\- Example showed \`correctIndex: 0\` (caused answer bias)
+
+\- No protection against instructions hidden inside PDF text
+
+**\*\*Improvements in the new prompt (V2):\*\***
+
+\- System message with clear rules + user message with the inputs
+
+\- Topic mode uses general knowledge; PDF mode uses only the lecture content
+
+\- Difficulty defined: Easy = recall, Medium = understanding/application, Hard = analysis/reasoning
+
+\- Rules for believable wrong options, no "All of the above"
+
+\- No duplicate or unclear questions
+
+\- Useful 1–2 sentence explanations
+
+\- Lecture text placed inside \`<lecture_content>\` tags and treated as study material only
+
+**## Vague vs Detailed Prompt (UI component: QuizForm)**
+
+\- **\*\*Vague prompt:\*\*** "Create a quiz generator form in React. The user should be able to type a topic or upload a PDF, pick a difficulty level and how many questions they want, then press a button to generate the quiz."
+
+\- **\*\*Detailed prompt:\*\*** Asked to rebuild the same form with clear requirements: send the PDF as "file"; topic of at least 3 characters; PDF only and max 5 MB; show the selected file name with a Remove button; labels linked with htmlFor/id; aria-pressed on the Enter Topic / Upload PDF toggle; role="alert" for errors; keyboard support with :focus-visible; WCAG AA contrast on a dark background; a mobile media query with margin from the screen edges and full-width fields; left-aligned labels; "Generating..." with the whole form disabled using a fieldset; and clearing the error when the user changes the input.
+
+\- **\*\*Differences:\*\***
+
+  - **\*\*Data:\*\*** the vague version sent the PDF as "pdf" (did not match our API contract); the detailed version sends it as "file".
+  - **\*\*Validation:\*\*** the vague version had no file size limit and accepted a 1-letter topic; the detailed version rejects PDFs over 5 MB, needs at least 3 characters and shows the file name with a Remove button.
+  - **\*\*Accessibility:\*\*** in the vague version errors were not announced to screen readers, the selected tab was shown only by colour, there was no clear focus style and labels had low contrast; the detailed version uses role="alert", aria-pressed, a yellow :focus-visible outline and high-contrast left-aligned labels.
+  - **\*\*Responsiveness:\*\*** on mobile the vague form touched the screen edges and had the same spacing as on a laptop; the detailed version keeps a margin from the edges, stacks all fields at full width and uses smaller padding.
+  - **\*\*State:\*\*** both showed "Generating..."; the detailed version also disables the whole form while loading and clears the error as soon as the user changes the input.
+
+\- **\*\*UI problem fixed:\*\*** the form touched the screen edges on mobile and labels were hard to read; fixed with a mobile media query, left-aligned labels and better contrast.
+
+\- **\*\*Screenshots:\*\*** docs/screenshots/vague-desktop.png, docs/screenshots/vague-mobile.png, docs/screenshots/detailed-desktop.png, docs/screenshots/detailed-mobile.png
 
 ---
 
-## 10. Summary of Anfal's Database and Quiz Management Contribution
+**# Prompt Log – QuizGenie (Backend API Testing – Postman)**
 
-I worked on reviewing the database structure and making the quiz management process more reliable. During the code review, I found a few issues that were not obvious in the initial AI-generated code.
+\| # | Prompt (short) | What AI gave | What was wrong | How we fixed it | Member |
+\|---|---|---|---|---|---|
+\| 1 | Test Get All Quizzes API using Postman (`GET /api/quizzes`) and verify the response when no quizzes exist | Step-by-step instructions for selecting GET, entering the API URL, sending the request and checking the response | Nothing wrong. The API request was executed and the actual response was checked | No fix needed. Verified `200 OK` with an empty array `[]` when no quizzes existed | kashaf  |
+\| 2 | Test Create Quiz API using Postman (`POST /api/quizzes`) with topic, difficulty and number of questions | Instructions for adding the `x-api-key` header, selecting form-data and entering the quiz details | Nothing wrong. The API accepted the request and created the quiz successfully | No fix needed. Verified the created quiz with ID 1, title Operating System, topic Operating System, difficulty Easy and 5 questions | kashaf  |
+\| 3 | Test Get Quiz By ID API using Postman (`GET /api/quizzes/1`) and verify the quiz details and questions | Step-by-step instructions for sending a GET request and checking the returned quiz information and questions | Nothing wrong. The actual API response was checked instead of assuming or inventing question data | No fix needed. Verified the returned quiz details and five Operating System questions against the actual response | kashaf  |
+\| 4 | Test Rename Quiz API using Postman (`PUT /api/quizzes/1`) with a raw JSON request body | Instructions for adding the API key, selecting Body → raw → JSON and sending the updated title | Nothing wrong. The request was successfully executed | No fix needed. Verified that the title changed to "Operating System Updated", while quiz ID 1 and its topic remained unchanged | kashaf |
+\| 5 | Test Submit Quiz Attempt API using Postman (`POST /api/quizzes/1/attempts`) with five answers | Step-by-step instructions for sending the answers in JSON format and checking the evaluation response | Nothing wrong. The submitted answers were evaluated successfully | No fix needed. Verified attemptId 1, score 5/5, percentage 100%, all five answers marked correct and explanations included | Member 5 |
+\| 6 | Verify the Quiz Evaluation result after submitting the quiz attempt. Do not create another attempt | Instructions for checking the existing attempt's score, total questions, percentage, correctness of answers and explanations | Nothing wrong. The existing evaluation result was checked without submitting another attempt | No fix needed. Verified score 5/5, total 5 questions, 100% percentage, all answers correct and explanations included | kashaf |
+\| 7 | Test Delete Quiz API using Postman (`DELETE /api/quizzes/1`) after completing all other tests and taking screenshots | Step-by-step instructions for selecting DELETE, entering the URL, adding the API key and checking the deletion response | Nothing wrong. The delete request was tested after the other API tests | No fix needed. Verified the successful deletion response, normally `200 OK` | kashaf |
 
-My main contributions included:
+**## Backend API Testing Summary**
 
-- Checking database tables and their relationships.
-- Making sure quizzes and their questions are saved together.
-- Fixing validation issues with PDF uploads.
-- Preventing incomplete answer submissions during score calculation.
-- Checking SQL queries for possible injection risks.
-- Making database error messages more helpful.
+\- Tested all seven API testing operations using Postman.
 
-These improvements helped make quiz saving, PDF uploads, and result evaluation more reliable.
+\- Verified GET, POST, PUT and DELETE HTTP methods.
 
----
+\- Tested API authentication using the `x-api-key` header for protected operations.
 
-## 11. Overall Project Learning and Conclusion
+\- Verified quiz creation, retrieval, renaming, quiz submission, evaluation and deletion.
 
-Working on QuizGenie gave our team an opportunity to use AI for frontend development, backend integration, database management, and code review.
+\- Confirmed the quiz evaluation result: 5/5 score and 100% percentage.
 
-Although AI helped us generate code and explain different parts of the project, its suggestions were not always correct or ready to use. We had to review the generated code, compare it with our API contract, run tests, and fix issues manually.
+\- Checked that all five submitted answers were marked correct and explanations were included.
 
-Some of the important things we learned during this process were:
+\- Completed the deletion test after finishing the other tests to preserve quiz data during testing.
 
-- A detailed prompt usually produces more useful code than a vague instruction.
-- AI-generated code should always be checked before using it in a project.
-- Testing is important because some problems only appear when different parts of the application work together.
-- Error handling should show meaningful messages instead of hiding failures.
-- Backend validation is important even when the frontend already checks user input.
-- Database transactions help protect data when multiple related records are saved.
-- Accessibility and responsive design should be considered during development, not added only at the end.
-- AI tools are helpful for development, but the final decisions and testing still require developer involvement.
+\- Used the actual API responses to verify the results instead of assuming expected output.
 
+**KASHAF**
