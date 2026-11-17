@@ -1,13 +1,14 @@
+
 # QuizGenie - Smart Quiz Generator
 
 ## Project Description
 
-QuizGenie is a web application that helps students prepare for exams. Students can upload a lecture PDF or enter a topic, and QuizGenie uses Gemini AI to turn it into a multiple-choice quiz. Students can then attempt the quiz, check their results with explanations, and save quizzes to practice again later.
+QuizGenie is a web application that helps students prepare for exams. Students can upload a lecture PDF or enter a topic, and QuizGenie uses AI to turn it into a multiple-choice quiz. Students can then attempt the quiz, check their results with explanations, and save quizzes to practice again later.
 
 ## Features
 
 - **Generate Quiz:** Upload a lecture PDF or enter a topic, then choose a difficulty level (Easy, Medium, Hard) and the number of questions (5, 10, 15).
-- **AI Quiz Generation:** Gemini AI creates multiple-choice questions, each with four options.
+- **AI Quiz Generation:** AI creates multiple-choice questions, each with four options.
 - **Attempt Quiz:** Answer the questions one by one using the Previous and Next buttons, with a progress indicator.
 - **Results:** See your score, percentage, and correct and wrong answers with explanations. You can also try the quiz again.
 - **Saved Quizzes:** View, rename and delete your saved quizzes.
@@ -18,8 +19,8 @@ QuizGenie is a web application that helps students prepare for exams. Students c
 |----------|------------|
 | Frontend | React 19.3.1, React DOM 19.3.1, React Router DOM 7.18.5, Axios 1.21.0, Vite 8.3.6 |
 | Backend | Node.js 24.14.0, Express |
-| Database | MySQL 8.0.45 |
-| AI | Gemini API |
+| Database | SQLite (better-sqlite3) |
+| AI | Groq API (via OpenAI SDK) |
 | Tools | VS Code, Git, GitHub, ChatGPT/Claude (AI-assisted coding) |
 
 ## API Endpoints
@@ -38,8 +39,7 @@ QuizGenie is a web application that helps students prepare for exams. Students c
 ### Prerequisites
 
 - Node.js 24.14.0
-- MySQL 8.0.45
-- A Gemini API key
+- A Groq API key (for AI quiz generation)
 
 ### 1. Clone the Repository
 
@@ -58,20 +58,24 @@ npm install
 Copy `.env.example` to a new file named `.env` inside the `backend` folder and fill in your details:
 
 ```env
-GEMINI_API_KEY=your_gemini_api_key
-DB_HOST=localhost
-DB_USER=your_mysql_username
-DB_PASSWORD=your_mysql_password
-DB_NAME=database_name
+PORT=5000
+CORS_ORIGIN=http://localhost:5173
+API_KEY=choose-a-secret
+
+OPENAI_API_KEY=your-groq-key-here
+AI_BASE_URL=https://api.groq.com/openai/v1
+AI_MODEL=openai/gpt-oss-120b
+AI_FALLBACK=false
 ```
 
 > **Note:** The `.env` file contains private keys and passwords. It is listed in `.gitignore` and should **not** be pushed to GitHub.
 
-Create the MySQL database, then start the backend server:
+Start the backend server:
 
 ```bash
-[backend start command, e.g. npm start]
+node server.js
 ```
+*(The SQLite database will be created automatically on the first run).*
 
 ### 3. Frontend Setup
 
@@ -83,11 +87,11 @@ npm install
 npm run dev
 ```
 
-Open the local link shown in the terminal in your browser.
+Open the local link shown in the terminal in your browser (usually `http://localhost:5173`).
 
 ## Usage
 
-1. **Generate a Quiz:** Upload a lecture PDF or type a topic, choose the difficulty and number of questions, then click Generate.
+1. **Generate a Quiz:** Upload a lecture PDF or type a topic, choose the difficulty and number of questions, then click generate.
 2. **Attempt the Quiz:** Select an answer for each question and move between questions with the Previous and Next buttons.
 3. **View Results:** After you submit, see your score, percentage, and correct and wrong answers with explanations. Click **Try Again** to reattempt.
 4. **Manage Saved Quizzes:** On the Home page, start, rename or delete any saved quiz.
@@ -96,11 +100,14 @@ Open the local link shown in the terminal in your browser.
 
 | Name | Role | Responsibilities |
 |------|------|------------------|
-| Mahnoor Ahmer | Frontend Developer and Manager | React pages, UI components, routing and connecting the UI to the API |
-| [Name] | Backend Developer | [Responsibilities] |
+| Mahnoor Ahmer | Frontend Developer and manager | React pages, UI components, routing and connecting the UI to the API |
+| **Nida Fatima** | **Backend Developer** | **Built the Express.js server and API routes. Implemented validation, authentication, error handling, and file uploads.** |
 | Eman Ansar | AI Integration | Connected the frontend to the backend; designed and improved the AI prompt (topic & PDF modes, difficulty levels, answer rules); set up Groq (`openai/gpt-oss-120b`) via configurable `.env`; fixed silent fallback, error status codes (400/502/503), mode detection (`sourceType`) and answer position bias (shuffle); maintained the prompt log with before/after evidence |
-| Anfal | **Database and Quiz Management** | Designed the SQLite schema with foreign keys and CASCADE delete; wrote parameterized queries to prevent SQL injection; used database transactions for atomic quiz creation; fixed the PDF upload validation bug and incomplete answer submission bug |
-| [Name] | Quiz Evaluation, Testing and Integration | [Responsibilities] |
+
+| Anfal | Database and Quiz Management | Designed the database schema (quizzes, questions, attempts) and set up the connection. Wrote secure, parameterized SQL queries. Implemented complete CRUD operations for quiz management and handled data relationships.|
+
+
+| Kashaf | Quiz Evaluation, Testing and Integration | Tested all seven backend API operations using Postman (Get All Quizzes, Create Quiz, Get Quiz by ID, Rename Quiz, Submit Quiz Attempt, Quiz Evaluation and Delete Quiz); verified API responses, authentication, quiz results (5/5, 100%), and documented testing evidence with screenshots. |
 
 ## AI Assisted Development
 
