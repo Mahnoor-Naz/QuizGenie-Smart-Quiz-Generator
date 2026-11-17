@@ -688,34 +688,28 @@ const api = axios.create({
 
 ---
 
-**# Prompt Log – QuizGenie (Backend API Testing – Postman)**
+*# Prompt Log – QuizGenie (Automated Test Cases)
 
-\| # | Prompt (short) | What AI gave | What was wrong | How we fixed it | Member |
-\|---|---|---|---|---|---|
-\| 1 | Test Get All Quizzes API using Postman (`GET /api/quizzes`) and verify the response when no quizzes exist | Step-by-step instructions for selecting GET, entering the API URL, sending the request and checking the response | Nothing wrong. The API request was executed and the actual response was checked | No fix needed. Verified `200 OK` with an empty array `[]` when no quizzes existed | kashaf  |
-\| 2 | Test Create Quiz API using Postman (`POST /api/quizzes`) with topic, difficulty and number of questions | Instructions for adding the `x-api-key` header, selecting form-data and entering the quiz details | Nothing wrong. The API accepted the request and created the quiz successfully | No fix needed. Verified the created quiz with ID 1, title Operating System, topic Operating System, difficulty Easy and 5 questions | kashaf  |
-\| 3 | Test Get Quiz By ID API using Postman (`GET /api/quizzes/1`) and verify the quiz details and questions | Step-by-step instructions for sending a GET request and checking the returned quiz information and questions | Nothing wrong. The actual API response was checked instead of assuming or inventing question data | No fix needed. Verified the returned quiz details and five Operating System questions against the actual response | kashaf  |
-\| 4 | Test Rename Quiz API using Postman (`PUT /api/quizzes/1`) with a raw JSON request body | Instructions for adding the API key, selecting Body → raw → JSON and sending the updated title | Nothing wrong. The request was successfully executed | No fix needed. Verified that the title changed to "Operating System Updated", while quiz ID 1 and its topic remained unchanged | kashaf |
-\| 5 | Test Submit Quiz Attempt API using Postman (`POST /api/quizzes/1/attempts`) with five answers | Step-by-step instructions for sending the answers in JSON format and checking the evaluation response | Nothing wrong. The submitted answers were evaluated successfully | No fix needed. Verified attemptId 1, score 5/5, percentage 100%, all five answers marked correct and explanations included | Member 5 |
-\| 6 | Verify the Quiz Evaluation result after submitting the quiz attempt. Do not create another attempt | Instructions for checking the existing attempt's score, total questions, percentage, correctness of answers and explanations | Nothing wrong. The existing evaluation result was checked without submitting another attempt | No fix needed. Verified score 5/5, total 5 questions, 100% percentage, all answers correct and explanations included | kashaf |
-\| 7 | Test Delete Quiz API using Postman (`DELETE /api/quizzes/1`) after completing all other tests and taking screenshots | Step-by-step instructions for selecting DELETE, entering the URL, adding the API key and checking the deletion response | Nothing wrong. The delete request was tested after the other API tests | No fix needed. Verified the successful deletion response, normally `200 OK` | kashaf |
+| # | Prompt (short) | What AI gave | What was wrong | How we fixed it | Member |
+|---|---|---|---|---|---|
+| 1 | Create automated test cases for QuizGenie using actual backend code and APIs | Step-by-step automated testing code using Node.js `node:test` and `assert` | Nothing wrong. The test cases were prepared using actual project routes and APIs | Created `backend/tests/quiz.test.js` with 16 automated test cases | Kashaf |
+| 2 | Test API authentication without providing an API key | Automated test TC-01 to check unauthorized quiz creation | Nothing wrong | Verified the expected 401 Unauthorized response using assertions | Kashaf |
+| 3 | Test quiz creation with missing topic, invalid difficulty and unsupported question count | Automated validation tests TC-02, TC-03 and TC-04 | Nothing wrong | Added assertions for expected 400 Bad Request responses | Kashaf |
+| 4 | Test successful quiz creation, quiz retrieval and invalid quiz ID | Automated tests TC-05, TC-06 and TC-07 | Nothing wrong | Verified quiz details, questions, quiz list and invalid ID response | Kashaf |
+| 5 | Test empty answer submission and invalid answer selection | Automated tests TC-08 and TC-12 | Nothing wrong | Added validation checks for empty answers and invalid selected indexes | Kashaf |
+| 6 | Test quiz evaluation with correct, incorrect and partially answered questions | Automated tests TC-09, TC-10 and TC-11 | Nothing wrong | Verified scores, percentages, correct answers and unanswered questions | Kashaf |
+| 7 | Test quiz renaming, empty title and nonexistent quiz | Automated tests TC-13, TC-14 and TC-15 | Nothing wrong | Added assertions for successful update, invalid title and 404 response | Kashaf |
+| 8 | Test quiz deletion and database integration | Automated test TC-16 | Nothing wrong | Verified quiz, questions and attempts deletion from the SQLite database | Kashaf |
 
-**## Backend API Testing Summary**
+## Automated Testing Summary
 
-\- Tested all seven API testing operations using Postman.
-
-\- Verified GET, POST, PUT and DELETE HTTP methods.
-
-\- Tested API authentication using the `x-api-key` header for protected operations.
-
-\- Verified quiz creation, retrieval, renaming, quiz submission, evaluation and deletion.
-
-\- Confirmed the quiz evaluation result: 5/5 score and 100% percentage.
-
-\- Checked that all five submitted answers were marked correct and explanations were included.
-
-\- Completed the deletion test after finishing the other tests to preserve quiz data during testing.
-
-\- Used the actual API responses to verify the results instead of assuming expected output.
+- Created 16 automated test cases (TC-01 to TC-16).
+- Tested authentication and input validation.
+- Tested quiz creation, retrieval, updating and deletion.
+- Tested correct, incorrect and partially answered quiz submissions.
+- Verified quiz scores, percentages and evaluation results.
+- Tested integration with Express routes and SQLite database.
+- Used Node.js built-in testing tools (`node:test` and `assert`).
+- Automated testing was prepared using actual project code instead of Postman.
 
 **KASHAF**
