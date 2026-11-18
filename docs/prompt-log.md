@@ -20,6 +20,24 @@
 
 ---
 
+# Prompt Log – QuizGenie (Backend Review and Final Verification)
+
+**Member: Nida**
+
+| # | Prompt (short) | What AI gave | What was wrong | How we fixed it |
+|---|---|---|---|---|
+| 1 | Review the database configuration, `schema.sql` and `quizModel.js`. Check tables, foreign keys, cascade delete, parameterized queries, transactions and database error handling. | A review of the database structure and updated code for any changed file, keeping the frontend API compatible. | The prompt said "Gemini", but our project uses a configurable provider (Groq through `AI_BASE_URL` and `AI_MODEL`). *(Add any real database issue you found.)* | Checked the relationships and tested that deleting a quiz also removes its questions and attempts. |
+| 2 | Review PDF upload and text extraction: PDF only, 5 MB limit, empty, corrupted or password-protected PDFs, and temp file cleanup. | A review of `pdfService.js` and the upload route, with fixes for validation and cleanup. | *(Write what you found, for example whether temp files were deleted when an error occurred.)* | Tested a text PDF, an image-only PDF, a corrupted PDF and a non-PDF file. Unreadable PDFs return 400. |
+| 3 | Review the AI integration for topic and PDF modes, 5/10/15 questions, three difficulty levels, four options per question, one correct answer, and validation of AI output before saving. | A review of `aiService.js` with response validation and error handling. | The prompt assumed Gemini. Our integration uses an OpenAI-compatible provider (Groq), so the Gemini-specific parts did not apply. | Kept our provider setup and applied only the validation and error handling ideas. |
+| 4 | Review validation, security and error handling: topic, question count, difficulty, quiz IDs, submitted answers, SQL injection, key security and score manipulation. | A review of `validate.js`, `auth.js` and `errorHandler.js` with fixes. | *(Write what you found, for example the "5, 10 or 15 only" rule against what `validate.js` actually accepts.)* | Compared the rules with the real backend responses before changing anything. |
+| 5 | Final backend review with Postman test cases, positive and negative tests, actual test results and a summary. | A review of all backend features, test cases and a status summary. | The prompt asked for Postman, but our team used Node.js `node:test` and `assert` instead, as our task says no external tools. | Wrote the automated tests in `backend/tests/quiz.test.js` instead (see the Automated Test Cases log). Only tests that were actually run are reported as passed. |
+| 6 | Review the React frontend and backend integration: endpoints, methods, request fields, response formats, Axios setup, API keys and hidden correct answers. | A comparison of frontend calls against backend routes with fixes. | Same issues we already found: mock mode was on, the base URL was incomplete, and the `x-api-key` header was missing. | `USE_MOCK = false`, `API_BASE_URL = "http://localhost:5000/api"`, and the key header added to the shared Axios instance. |
+| 7 | Complete end-to-end check of the 15-step workflow, from entering a topic to rename and delete. | A step-by-step verification plan and a final status report. | *(Write any step that failed during your own run.)* | Ran the full flow in the browser and confirmed each step. Evidence: add screenshots. |
+
+**NIDA**
+
+---
+
 ## 2. Prompt Log – QuizGenie (AI Integration)
 
 **Member: Eman Ansar**
@@ -401,13 +419,14 @@ It included:
 
 **Member: Anfal**
 
-| # | Prompt (Short) | What AI Provided | What Was Wrong | How We Fixed It |
+| # | Prompt (short) | What AI gave | What was wrong | How we fixed it |
 |---|---|---|---|---|
-| 1 | Review `schema.sql` and `db.js` for a SQLite database managing quizzes, questions, and attempts. | AI provided a database structure with three tables, foreign keys, and cascade deletion. | I did not find any major issue in the generated schema. | I checked the table relationships and tested that deleting a quiz also removes its related questions and attempts. |
-| 2 | Write the `createQuiz` function in `quizModel.js` to save a quiz and its questions. | AI generated a function that first saved the quiz and then inserted its questions one by one. | **Non-trivial issue:** If something went wrong while saving the questions, the quiz could still be saved without all its questions. | I fixed this by using `db.transaction()` from `better-sqlite3`, so the complete quiz is saved together or rolled back if an error occurs. |
-| 3 | Review `validate.js` and `quizRoutes.js` for input validation. | AI added checks for the topic, difficulty, and number of questions. | **Non-trivial issue:** PDF uploads could fail because the validator was checking the topic even when a file was provided. | I updated the condition to skip topic validation when `req.file` is available. |
-| 4 | Review `evaluationService.js` for calculating quiz scores. | AI generated a function to compare submitted answers with the correct answers and calculate the final score. | **Non-trivial issue:** The function did not check whether the user had submitted answers for all questions. | I added a check to compare the submitted answer count with the total number of questions before calculating the score. |
-| 5 | How to prevent SQL injection in `quizModel.js`. | AI suggested using parameterized queries with `?` placeholders. | I checked the existing queries and did not find a major issue with SQL injection protection. | I verified that the database queries use prepared statements and parameterized values. |
+| 1 | Review `schema.sql` and `db.js`: tables, foreign keys, `ON DELETE CASCADE`, database connection, migrations, missing indexes and constraints for quiz attempts. | A review of the three tables (quizzes, questions, attempts), the foreign key setup and cascade deletion, with corrected `schema.sql` and `db.js`. | I did not find any major issue in the generated schema. *(Add any real issue, for example a missing index or a foreign key setting.)* | Checked the table relationships and tested that deleting a quiz also removes its questions and attempts. |
+| 2 | Review `quizModel.js` and fix `createQuiz()` so a quiz and all its questions are saved together, with options stored using `JSON.stringify()` and rollback on error. | A `createQuiz()` function that saved the quiz first and then inserted its questions one by one. | **Non-trivial issue:** If an error happened while saving the questions, the quiz could stay in the database with only some of its questions. | Used `db.transaction()` from `better-sqlite3`, so the quiz and all its questions are saved together or rolled back if anything fails. |
+| 3 | Review `validate.js` and `quizRoutes.js`: topic 3 to 200 characters, difficulty Easy/Medium/Hard, question count 5/10/15, PDF upload without a topic, file type and size checks, and temp file deletion. | Validation rules for topic, difficulty and question count, with corrected `validate.js` and route code. | **Non-trivial issue:** PDF uploads could fail because the validator checked the topic even when a file was uploaded and the topic field was empty. *(Add anything else you found, for example temp file cleanup on errors.)* | Changed the condition so topic validation only runs when `req.file` is not present. Tested with a PDF upload and with a topic only. |
+| 4 | Review `evaluationService.js`: compare answers with `correctIndex`, reject incomplete answers, duplicate question IDs, invalid question IDs and invalid `selectedIndex`, and return 400. | A function that compared submitted answers with the correct answers and calculated score, total and percentage. | **Non-trivial issue:** The function did not check that every question had a submitted answer, so a five-question quiz could be scored with only two answers. *(The prompt also asked for duplicate ID and invalid index checks. Write which of these were already handled and which you added.)* | Added a check at the start of `evaluateAnswers()` that compares the submitted answer count with the number of questions and throws an error with `status = 400`. |
+| 5 | Review all queries in `quizModel.js` (select, insert, update, delete, attempts) for SQL injection and use parameterized queries. | A check of every query type for `?` placeholders and a statement of whether a fix was needed. | I checked the existing queries and did not find a SQL injection risk. | Verified that all queries use prepared statements with parameterized values. No change was needed. |
+| 6 | Review the React frontend and backend connection: endpoints, methods, request fields, response formats, error display and API key handling. | A comparison of frontend API calls with backend routes, with fixes for affected files. | Two mismatches: `USE_MOCK` was `true` with an incomplete URL (`localhost:[PORT]`), and the frontend did not send the `x-api-key` header, so requests got 401. | Set `USE_MOCK = false` and `API_BASE_URL = "http://localhost:5000/api"`, and added the `x-api-key` header to the shared Axios instance. `VITE_API_KEY` must match the backend `API_KEY`. |
 
 ---
 
@@ -637,28 +656,52 @@ const api = axios.create({
 
 ---
 
-*# Prompt Log – QuizGenie (Automated Test Cases)
+# Prompt Log – QuizGenie (Automated Test Cases)
 
-| # | Prompt (short) | What AI gave | What was wrong | How we fixed it | Member |
-|---|---|---|---|---|---|
-| 1 | Create automated test cases for QuizGenie using actual backend code and APIs | Step-by-step automated testing code using Node.js `node:test` and `assert` | Nothing wrong. The test cases were prepared using actual project routes and APIs | Created `backend/tests/quiz.test.js` with 16 automated test cases | Kashaf |
-| 2 | Test API authentication without providing an API key | Automated test TC-01 to check unauthorized quiz creation | Nothing wrong | Verified the expected 401 Unauthorized response using assertions | Kashaf |
-| 3 | Test quiz creation with missing topic, invalid difficulty and unsupported question count | Automated validation tests TC-02, TC-03 and TC-04 | Nothing wrong | Added assertions for expected 400 Bad Request responses | Kashaf |
-| 4 | Test successful quiz creation, quiz retrieval and invalid quiz ID | Automated tests TC-05, TC-06 and TC-07 | Nothing wrong | Verified quiz details, questions, quiz list and invalid ID response | Kashaf |
-| 5 | Test empty answer submission and invalid answer selection | Automated tests TC-08 and TC-12 | Nothing wrong | Added validation checks for empty answers and invalid selected indexes | Kashaf |
-| 6 | Test quiz evaluation with correct, incorrect and partially answered questions | Automated tests TC-09, TC-10 and TC-11 | Nothing wrong | Verified scores, percentages, correct answers and unanswered questions | Kashaf |
-| 7 | Test quiz renaming, empty title and nonexistent quiz | Automated tests TC-13, TC-14 and TC-15 | Nothing wrong | Added assertions for successful update, invalid title and 404 response | Kashaf |
-| 8 | Test quiz deletion and database integration | Automated test TC-16 | Nothing wrong | Verified quiz, questions and attempts deletion from the SQLite database | Kashaf |
+**Member: Kashaf**
+
+| # | Prompt (short) | What AI gave | What was wrong | How we fixed it |
+|---|---|---|---|---|
+| 1 | Review my actual backend (routes, auth middleware, validation, error handler, AI service, database model and schema) and create automated test cases using Node.js only, without Postman, Jest or any external framework. | AI reviewed the backend files and proposed a plan using Node's built-in `node:test` and `assert`. Tests start a local Express server on a random port with the real `quizRoutes`, `notFound` and `errorHandler`, and send real HTTP requests with `fetch`. It also found the order of checks: authentication, then topic/PDF validation, then difficulty validation. | Nothing wrong with the review. | Created `backend/tests/quiz.test.js` and built all tests against the actual routes and middleware instead of assumed responses. |
+| 2 | **TC-01:** Test that quiz creation is rejected when the API key is missing. | A test that sends `POST /api/quizzes` without the `x-api-key` header. | **Non-trivial issue:** The first summary said TC-01 returns 500 "Server auth misconfigured". Our `auth.js` returns 500 only when the server's own `API_KEY` variable is missing. A request without the header, when the server key is set, returns 401. | Corrected TC-01 to test the missing request header and assert 401 with "Unauthorized: invalid API key". The test sets a temporary `API_KEY` and restores the old value afterwards. |
+| 3 | **TC-02 to TC-04:** Test quiz creation with missing topic and PDF, invalid difficulty, and unsupported question count. | Three validation tests that send a valid API key and one invalid field each. | Nothing wrong. | Asserted HTTP 400 and the exact backend messages. TC-02: "Please provide a topic or a PDF file". TC-03: "difficulty must be Easy, Medium or Hard". TC-04: checked against the message in `validate.js`. |
+| 4 | **TC-05:** Test successful quiz creation. | A test that creates a quiz with a valid topic, difficulty and question count. | AI did not want to call the real AI provider in tests, since that depends on a paid or rate-limited API and returns random questions. | Ran the test without calling the live provider and checked the saved quiz title, topic, difficulty and number of questions. |
+| 5 | **TC-06 and TC-07:** Test quiz retrieval, the quiz list, and an invalid quiz ID. | Tests for `GET /api/quizzes` and `GET /api/quizzes/:id`, plus a request with a nonexistent ID. | Nothing wrong. | Verified quiz details, questions, list contents and the 404 response for an invalid ID. |
+| 6 | **TC-08 and TC-12:** Test submitting an empty answers list and an invalid selected option index. | Two validation tests for the attempt route. | Nothing wrong. | Asserted 400 for empty answers and for a selected index outside the valid range. Both use the status and error message the backend actually returns. |
+| 7 | **TC-09, TC-10 and TC-11:** Test evaluation with all correct, all incorrect, and partially answered questions. | Three tests that create a quiz, submit answers and check the result. | Partial answers had to match Anfal's check in `evaluateAnswers()`, which rejects a submission whose answer count differs from the question count. | Made sure unanswered questions are sent in the format the backend expects. Verified score, percentage, correct answers and unanswered count for each case. |
+| 8 | **TC-13, TC-14 and TC-15:** Test renaming a quiz, renaming with an empty title, and renaming a nonexistent quiz. | Three tests for the rename route. | Nothing wrong. | Asserted a successful update, 400 for an empty title and 404 for a missing quiz, using the real error messages. |
+| 9 | **TC-16:** Test quiz deletion and database integration. | A test that deletes a quiz and then checks the database. | Nothing wrong. | Verified that the quiz, its questions and its attempts are all removed (cascade delete from `schema.sql`). |
+| 10 | Make each test check the actual status code and error message, keep tests separate with clear IDs, and run them all. | A single file with 16 clearly labelled tests (TC-01 to TC-16). | Nothing wrong. | Ran `node --test tests/quiz.test.js` and `npm test`. Evidence: add screenshot of the passing run. |
+
+## Test Case Summary
+
+| ID | What it tests | Expected status |
+|---|---|---|
+| TC-01 | Quiz creation without API key | 401 |
+| TC-02 | Quiz creation without topic and PDF | 400 |
+| TC-03 | Quiz creation with invalid difficulty | 400 |
+| TC-04 | Quiz creation with unsupported question count | 400 |
+| TC-05 | Successful quiz creation | 201 |
+| TC-06 | Quiz retrieval and quiz list | 200 |
+| TC-07 | Invalid quiz ID | 404 |
+| TC-08 | Empty answer submission | 400 |
+| TC-09 | Evaluation with all correct answers | 200 |
+| TC-10 | Evaluation with all incorrect answers | 200 |
+| TC-11 | Evaluation with partially answered quiz | 200 |
+| TC-12 | Invalid selected option index | 400 |
+| TC-13 | Rename quiz successfully | 200 |
+| TC-14 | Rename quiz with empty title | 400 |
+| TC-15 | Rename nonexistent quiz | 404 |
+| TC-16 | Delete quiz and related data | 200 |
 
 ## Automated Testing Summary
 
 - Created 16 automated test cases (TC-01 to TC-16).
 - Tested authentication and input validation.
-- Tested quiz creation, retrieval, updating and deletion.
-- Tested correct, incorrect and partially answered quiz submissions.
-- Verified quiz scores, percentages and evaluation results.
-- Tested integration with Express routes and SQLite database.
-- Used Node.js built-in testing tools (`node:test` and `assert`).
-- Automated testing was prepared using actual project code instead of Postman.
+- Tested quiz creation, retrieval, renaming and deletion.
+- Tested correct, incorrect and partially answered submissions.
+- Verified scores, percentages and evaluation results.
+- Tested integration with the Express routes and the SQLite database.
+- Used Node.js built-in `node:test` and `assert`, with no Postman, Jest or external framework.
 
 **KASHAF**
