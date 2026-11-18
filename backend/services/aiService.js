@@ -20,11 +20,14 @@ function aiError(message, status) {
 }
 
 export async function generateQuestions({ source, sourceType = "topic", difficulty, numQuestions }) {
-     if (!openai || !AI_MODEL) {
-    console.error("AI failed: OPENAI_API_KEY or AI_MODEL missing in .env");
-    if (USE_FALLBACK) return generateFallback(source, difficulty, numQuestions);
-    throw aiError("AI is not configured on the server. Please contact the admin.", 503);
+    if (!openai || !AI_MODEL) {
+  if (USE_FALLBACK) {
+    return generateFallback(source, difficulty, numQuestions);
   }
+
+  console.error("AI failed: OPENAI_API_KEY or AI_MODEL missing in .env");
+  throw aiError("AI is not configured on the server. Please contact the admin.", 503);
+}
 
   try {
     return await generateWithAI(source, difficulty, numQuestions, sourceType);

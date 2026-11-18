@@ -304,7 +304,9 @@ test("QuizGenie - Automated API Testing", async (t) => {
   });
 
   // TC-11: Partial answer evaluation
-  await t.test("TC-11 - Evaluate partially answered quiz", async () => {
+ 
+  // TC-11: Reject partially answered quiz
+  await t.test("TC-11 - Reject partially answered quiz", async () => {
     const answers = [
       {
         questionId: questions[0].id,
@@ -323,18 +325,11 @@ test("QuizGenie - Automated API Testing", async (t) => {
 
     const result = await response.json();
 
-    assert.equal(response.status, 200);
-    assert.equal(result.score, 1);
-    assert.equal(result.total, 5);
-    assert.equal(result.percentage, 20);
-    assert.equal(result.results.length, 5);
-
-    const unanswered = result.results.filter(
-      (r) => r.selectedIndex === null
-    );
-
-    assert.equal(unanswered.length, 4);
+    assert.equal(response.status, 400);
+    assert.ok(result.error);
+    assert.match(result.error, /Incomplete answers/i);
   });
+
 
   // TC-12: Invalid selected answer index
   await t.test("TC-12 - Reject answer index outside valid range", async () => {
